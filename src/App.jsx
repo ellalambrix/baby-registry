@@ -490,6 +490,7 @@ export default function BabyRegistry() {
           </div>
         </div>
 
+        const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "22px 16px 0", textAlign: "center" }}>
           {isRep ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
