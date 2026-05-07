@@ -34,16 +34,31 @@ const ERA_LYRICS = {
 
 // ── Category config ────────────────────────────────────────────────────────
 const CATEGORY_COLORS = {
+  // Baby
   Sleep: "#7298af", Feeding: "#df9a81", Diapering: "#477760", Transport: "#295ba4",
   Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing & Comfort": "#e59bc4", "Health & Safety": "#7f2922",
+  // Toddler
+  "Potty Training":              "#477760",
+  "Big Feelings & Social Emotional": "#e59bc4",
+  "Play & Imagination":          "#dccf73",
+  "Toddler Feeding & Nutrition": "#df9a81",
+  "Sleep (Toddler)":             "#7298af",
+  "Books & Learning":            "#c8a951",
+  "Outdoor & Active Play":       "#5a8a73",
+  // Parent
   "Feeding Support": "#df9a81", "Solids & Starting Foods": "#5a8a73", "Sleep Resources": "#7298af",
   "Postpartum Recovery": "#e59bc4", "Mental Health & Wellness": "#7f2922", "Parenting Tools & Apps": "#2e4f3f",
   "Recommended Reading": "#dccf73", "Favorite Shops & Resale": "#df9a81",
+  "Hospital Bag":    "#b8a4c9",
+  "Screen Time & Apps": "#295ba4",
+  "Childcare & Preschool": "#8b6914",
 };
 const catColor = (cat) => CATEGORY_COLORS[cat] || "#df9a81";
-const BABY_CATS   = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Health & Safety"];
-const PARENT_CATS = ["Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Recommended Reading", "Favorite Shops & Resale"];
-const BASE_CATEGORIES = [...BABY_CATS, ...PARENT_CATS];
+
+const BABY_CATS     = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Health & Safety"];
+const TODDLER_CATS  = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play"];
+const PARENT_CATS   = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale"];
+const BASE_CATEGORIES = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS];
 const MEDAL = ["🥇", "🥈", "🥉"];
 const SPARKLE = "✦";
 
@@ -315,8 +330,9 @@ export default function BabyRegistry() {
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleAddItem = async (newItem) => {
     setItems(its => [...its, newItem]);
-    const isParentCat = PARENT_CATS.includes(newItem.category);
-    setActiveSection(isParentCat ? "parents" : "baby");
+    const isParentCat  = PARENT_CATS.includes(newItem.category);
+    const isToddlerCat = TODDLER_CATS.includes(newItem.category);
+    setActiveSection(isParentCat ? "parents" : isToddlerCat ? "toddler" : "baby");
     setActiveCategory(newItem.category);
     setExpandedItem(newItem.id);
     setSuccessMsg(`"${newItem.name}" added to ${newItem.category}!`);
@@ -369,8 +385,11 @@ export default function BabyRegistry() {
   const sortedRecs = (recs) => [...recs].sort((a, b) => b.votes - a.votes);
   const allCategories = [...new Set([...BASE_CATEGORIES, ...items.map(i => i.category)])];
   const sectionCats = activeSection === "baby"
-    ? allCategories.filter(c => !PARENT_CATS.includes(c) || BABY_CATS.includes(c))
-    : allCategories.filter(c => PARENT_CATS.includes(c) || (!BABY_CATS.includes(c) && !PARENT_CATS.includes(c)));
+    ? allCategories.filter(c => BABY_CATS.includes(c))
+    : activeSection === "toddler"
+    ? allCategories.filter(c => TODDLER_CATS.includes(c))
+    : allCategories.filter(c => PARENT_CATS.includes(c));
+  const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
   const displayCategories = ["All", ...sectionCats];
   const filtered = items
     .filter(i => sectionCats.includes(i.category))
@@ -388,7 +407,7 @@ export default function BabyRegistry() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: bg, fontFamily: "'Palatino Linotype', Palatino, serif", transition: "background 0.5s ease", position: "relative", overflow: "hidden" }}>
+    <div className="registry-root" style={{ minHeight: "100vh", background: bg, fontFamily: "'Palatino Linotype', Palatino, serif", transition: "background 0.5s ease", position: "relative", overflow: "hidden" }}>
 
       {/* ── Reputation background snakes ── */}
       {isRep && (
@@ -444,8 +463,12 @@ export default function BabyRegistry() {
 
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
             <div style={{ display: "inline-flex", borderRadius: "30px", border: `1.5px solid ${isRep ? R.borderHi : accentCol + "50"}`, overflow: "hidden", background: isRep ? "transparent" : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)" }}>
-              {[{ key: "baby", label: "👶 For Baby" }, { key: "parents", label: "🧡 For Parents" }].map(s => (
-                <button key={s.key} onClick={() => { setActiveSection(s.key); setActiveCategory("All"); }} style={{ padding: "9px 22px", border: "none", cursor: "pointer", background: activeSection === s.key ? accentCol : "transparent", color: activeSection === s.key ? (isRep ? R.bg : "#fff") : textSub, fontSize: "13.5px", fontFamily: "inherit", fontWeight: activeSection === s.key ? "600" : "400", transition: "all 0.2s" }}>{s.label}</button>
+              {[
+                { key: "baby",    label: "👶 For Baby" },
+                { key: "toddler", label: "🧒 Toddler" },
+                { key: "parents", label: "🧡 For Parents" },
+              ].map(s => (
+                <button key={s.key} onClick={() => { setActiveSection(s.key); setActiveCategory("All"); }} style={{ padding: "9px 18px", border: "none", cursor: "pointer", background: activeSection === s.key ? accentCol : "transparent", color: activeSection === s.key ? (isRep ? R.bg : "#fff") : textSub, fontSize: "13.5px", fontFamily: "inherit", fontWeight: activeSection === s.key ? "600" : "400", transition: "all 0.2s", whiteSpace: "nowrap" }}>{s.label}</button>
               ))}
             </div>
             <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
@@ -467,20 +490,20 @@ export default function BabyRegistry() {
           </div>
         </div>
 
-        {/* ── Section label ── */}
+        const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "22px 16px 0", textAlign: "center" }}>
           {isRep ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
               <div style={{ flex: 1, height: "1px", background: R.border }} />
               <span style={{ fontSize: "10px", letterSpacing: "0.3em", color: R.textMuted, textTransform: "uppercase" }}>
-                <span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` ${activeSection === "baby" ? "For the little one" : "For the parent"} `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span>
+                <span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` ${sectionLabel} `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span>
               </span>
               <div style={{ flex: 1, height: "1px", background: R.border }} />
             </div>
           ) : (
             <div style={{ marginBottom: "14px" }}>
               <span style={{ fontSize: "11px", letterSpacing: "0.2em", color: accentCol, textTransform: "uppercase" }}>
-                <span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` ${activeSection === "baby" ? "For the little one" : "For the parent"} `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span>
+                <span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` ${sectionLabel} `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span>
               </span>
             </div>
           )}
@@ -678,6 +701,36 @@ export default function BabyRegistry() {
         @keyframes successPop { 0%{transform:translateX(-50%) scale(0.7);opacity:0}60%{transform:translateX(-50%) scale(1.05)}100%{transform:translateX(-50%) scale(1);opacity:1} }
         @keyframes modalPop { from{opacity:0;transform:translate(-50%,-48%) scale(0.96)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
+
+        /* ── Desktop font bump: all text +2pt on screens ≥ 768px ── */
+        @media (min-width: 768px) {
+          .registry-root * {
+            font-size: calc(var(--fs, inherit) + 0px);
+          }
+          .registry-root {
+            font-size: 18px;
+          }
+          .registry-root h1 {
+            font-size: clamp(34px, 7vw, 60px) !important;
+          }
+          .registry-root h2 {
+            font-size: 19px !important;
+          }
+          .registry-root p,
+          .registry-root span,
+          .registry-root button,
+          .registry-root input,
+          .registry-root textarea,
+          .registry-root select,
+          .registry-root a,
+          .registry-root label {
+            font-size: calc(1em + 2px);
+          }
+          /* Keep small decorative elements from blowing up */
+          .registry-root .no-scale {
+            font-size: inherit !important;
+          }
+        }
       `}</style>
     </div>
   );
