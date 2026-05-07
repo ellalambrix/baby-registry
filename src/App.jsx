@@ -461,7 +461,20 @@ export default function BabyRegistry() {
 
           <p style={{ margin: "14px 0 20px", color: textSub, fontSize: "14px", fontStyle: "italic" }}>Community-ranked recommendations — vote for your favorites</p>
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
+            <option value="category">Sort by Category</option>
+            <option value="votes">Sort by Most Loved</option>
+          </select>
+        </div>
+
+        {/* ── Era strip ── */}
+        {!isRep && <div style={{ height: "3px", background: `linear-gradient(90deg, transparent, ${accentCol}, ${accentCol}88, transparent)` }} />}
+
+        {/* ── Sticky nav: section tabs + category pills ── */}
+        <div style={{ position: "sticky", top: 0, zIndex: 30, boxShadow: `0 2px 12px ${isRep ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.08)"}` }}>
+
+          {/* Section switcher */}
+          <div style={{ background: isRep ? "rgba(8,8,8,0.97)" : isDark ? "rgba(10,10,18,0.97)" : `rgba(${isShowgirl ? "214,240,238" : "255,255,255"},0.97)`, backdropFilter: "blur(12px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "30"}`, padding: "10px 16px", display: "flex", justifyContent: "center" }}>
             <div style={{ display: "inline-flex", borderRadius: "30px", border: `1.5px solid ${isRep ? R.borderHi : accentCol + "50"}`, overflow: "hidden", background: isRep ? "transparent" : isDark ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.5)" }}>
               {[
                 { key: "baby",    label: "👶 For Baby" },
@@ -471,26 +484,19 @@ export default function BabyRegistry() {
                 <button key={s.key} onClick={() => { setActiveSection(s.key); setActiveCategory("All"); }} style={{ padding: "9px 18px", border: "none", cursor: "pointer", background: activeSection === s.key ? accentCol : "transparent", color: activeSection === s.key ? (isRep ? R.bg : "#fff") : textSub, fontSize: "13.5px", fontFamily: "inherit", fontWeight: activeSection === s.key ? "600" : "400", transition: "all 0.2s", whiteSpace: "nowrap" }}>{s.label}</button>
               ))}
             </div>
-            <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
-              <option value="category">Sort by Category</option>
-              <option value="votes">Sort by Most Loved</option>
-            </select>
           </div>
-        </div>
 
-        {/* ── Era strip ── */}
-        {!isRep && <div style={{ height: "3px", background: `linear-gradient(90deg, transparent, ${accentCol}, ${accentCol}88, transparent)` }} />}
-
-        {/* ── Category Tabs ── */}
-        <div style={{ background: isRep ? "rgba(8,8,8,0.9)" : isDark ? "rgba(10,10,18,0.8)" : "rgba(255,255,255,0.4)", backdropFilter: "blur(8px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "30"}`, padding: "10px 16px", overflowX: "auto" }}>
-          <div style={{ display: "flex", gap: "7px", minWidth: "max-content", margin: "0 auto", maxWidth: "960px" }}>
-            {displayCategories.map(cat => { const cc = cat === "All" ? accentCol : catColor(cat); const active = activeCategory === cat;
-              return <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: "6px 14px", borderRadius: "20px", border: `1.5px solid ${active ? cc : isRep ? R.border : cc + "40"}`, background: active ? cc : "transparent", color: active ? (isRep && cat !== "All" ? "#000" : "#fff") : textSub, fontSize: "12.5px", cursor: "pointer", fontFamily: "inherit", fontWeight: active ? "600" : "400", transition: "all 0.18s", whiteSpace: "nowrap" }}>{cat}</button>;
-            })}
+          {/* Category pills */}
+          <div style={{ background: isRep ? "rgba(8,8,8,0.97)" : isDark ? "rgba(10,10,18,0.97)" : `rgba(${isShowgirl ? "214,240,238" : "255,255,255"},0.97)`, backdropFilter: "blur(8px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "25"}`, padding: "8px 16px", overflowX: "auto" }}>
+            <div style={{ display: "flex", gap: "7px", minWidth: "max-content", margin: "0 auto", maxWidth: "960px" }}>
+              {displayCategories.map(cat => { const cc = cat === "All" ? accentCol : catColor(cat); const active = activeCategory === cat;
+                return <button key={cat} onClick={() => setActiveCategory(cat)} style={{ padding: "5px 13px", borderRadius: "20px", border: `1.5px solid ${active ? cc : isRep ? R.border : cc + "40"}`, background: active ? cc : "transparent", color: active ? (isRep && cat !== "All" ? "#000" : "#fff") : textSub, fontSize: "12.5px", cursor: "pointer", fontFamily: "inherit", fontWeight: active ? "600" : "400", transition: "all 0.18s", whiteSpace: "nowrap" }}>{cat}</button>;
+              })}
+            </div>
           </div>
-        </div>
 
-        const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
+        </div>{/* end sticky nav */}
+
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "22px 16px 0", textAlign: "center" }}>
           {isRep ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
