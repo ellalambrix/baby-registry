@@ -90,8 +90,8 @@ function HelpModal({ isOpen, onClose, cardBg, textMain, textSub, mutedText, acce
   const sections = [
     { icon: "📋", title: "Browse three sections", body: <><strong style={{ fontWeight: "600" }}>For Baby</strong>, <strong style={{ fontWeight: "600" }}>Toddler</strong>, and <strong style={{ fontWeight: "600" }}>For Parents</strong> — each has its own categories. Filter using the pills below the tabs.</> },
     { icon: "🏆", title: "Vote for your favorites", body: "Tap any item to expand it. Hit ▲ if you loved it, ▼ if you didn't. The most-loved pick rises to the top. It's democracy, but make it baby gear." },
-    { icon: "🔖", title: "Before you shop tips", body: "Each item has a \"Before you shop\" tab with general advice — things to know before buying anything. Add your own tips there." },
-    { icon: "💬", title: "Leave a note", body: "Tap 💬 on any recommendation to share the real talk. Your name is optional. Your opinions are not." },
+    { icon: "✨", title: "Community Wisdom", body: "Each item has a \"Community Wisdom\" tab with general advice — things to know before diving in. Add your own wisdom there." },
+    { icon: "💬", title: "Leave a note", body: "Tap 💬 on any recommendation to share the real talk. Or add to Community Wisdom for general advice. Your name is optional. Your opinions are not." },
     { icon: "✦", title: "Add what's missing", body: <>Hit the <strong style={{ fontWeight: "600" }}>✦ button</strong> bottom-right to add a new item, or tap <strong style={{ fontWeight: "600" }}>"Suggest another brand"</strong> inside any item.</> },
   ];
   return (
@@ -254,6 +254,7 @@ export default function BabyRegistry() {
   const [activeSection, setActiveSection]   = useState("baby");
   const [activeCategory, setActiveCategory] = useState("All");
   const [recVotes, setRecVotes]             = useState({});
+  const [helpfulVotes, setHelpfulVotes]     = useState({}); // parent section thumbs up
   const [expandedItem, setExpandedItem]     = useState(null);
   const [activeTab, setActiveTab]           = useState({});       // { [itemId]: "recs" | "tips" }
   const [expandedRec, setExpandedRec]       = useState(null);
@@ -351,6 +352,15 @@ export default function BabyRegistry() {
     setItems(its => its.map(item => item.id !== itemId ? item : { ...item, recs: item.recs.map(r => r.id === recId ? { ...r, votes: r.votes + adjustment } : r) }));
     try { const { data: rec } = await supabase.from("recs").select("votes").eq("id", recId).single(); await supabase.from("recs").update({ votes: rec.votes + adjustment }).eq("id", recId); }
     catch (err) { console.error("Vote failed:", err); }
+  };
+
+  const handleHelpfulVote = async (itemId, recId) => {
+    const isActive = !!helpfulVotes[recId];
+    const adjustment = isActive ? -1 : 1;
+    setHelpfulVotes(v => { const n = { ...v }; if (isActive) delete n[recId]; else n[recId] = true; return n; });
+    setItems(its => its.map(item => item.id !== itemId ? item : { ...item, recs: item.recs.map(r => r.id === recId ? { ...r, votes: r.votes + adjustment } : r) }));
+    try { const { data: rec } = await supabase.from("recs").select("votes").eq("id", recId).single(); await supabase.from("recs").update({ votes: rec.votes + adjustment }).eq("id", recId); }
+    catch (err) { console.error("Helpful vote failed:", err); }
   };
 
   const addComment = async (itemId, recId) => {
@@ -532,6 +542,8 @@ export default function BabyRegistry() {
                     const tipCount = (item.tips || []).length;
                     const commentCount = totalComments(item);
                     const tab = getTab(item.id);
+                    const isParentSection = PARENT_CATS.includes(item.category);
+                    const totalHelpful = item.recs.reduce((s, r) => s + r.votes, 0);
 
                     return (
                       <div key={item.id} style={{ background: cardBg, borderRadius: isRep ? "6px" : "16px", border: `1.5px solid ${isOpen ? (isRep ? R.borderHi : cc + "80") : (isRep ? R.border : borderCol)}`, overflow: "hidden", boxShadow: isOpen ? (isRep ? "0 0 0 1px #444, 0 8px 32px rgba(0,0,0,0.8)" : `0 6px 28px ${cc}22`) : (isRep ? "0 2px 8px rgba(0,0,0,0.6)" : "0 1px 5px rgba(0,0,0,0.06)"), transition: "box-shadow 0.2s", position: "relative" }}>
@@ -545,18 +557,25 @@ export default function BabyRegistry() {
                               <span style={{ fontSize: "10.5px", padding: "2px 8px", borderRadius: isRep ? "2px" : "10px", background: isRep ? R.dim : cc + "22", color: isRep ? R.textSub : textMain, border: `1px solid ${isRep ? R.borderHi : cc + "55"}`, letterSpacing: isRep ? "0.08em" : "0", textTransform: isRep ? "uppercase" : "none" }}>{item.category}</span>
                             </div>
                             {topRec ? (
-                              <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-                                <span style={{ fontSize: "11.5px", color: isRep ? R.textMuted : accentCol }}>Top Pick:</span>
-                                <span style={{ fontSize: "13px", color: textSub, fontStyle: "italic" }}>{topRec.brand} {topRec.model}</span>
-                                <span style={{ fontSize: "11px", color: mutedText }}>({topRec.votes} votes{item.recs.length > 1 ? `, +${item.recs.length - 1} alt${item.recs.length > 2 ? "s" : ""}` : ""})</span>
-                              </div>
+                              isParentSection ? (
+                                <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                                  <span style={{ fontSize: "11.5px", color: isRep ? R.textMuted : accentCol }}>{item.recs.length} resource{item.recs.length !== 1 ? "s" : ""}</span>
+                                  {totalHelpful > 0 && <span style={{ fontSize: "11px", color: mutedText }}>· {totalHelpful} found {totalHelpful === 1 ? "this" : "these"} helpful</span>}
+                                </div>
+                              ) : (
+                                <div style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+                                  <span style={{ fontSize: "11.5px", color: isRep ? R.textMuted : accentCol }}>Top Pick:</span>
+                                  <span style={{ fontSize: "13px", color: textSub, fontStyle: "italic" }}>{topRec.brand} {topRec.model}</span>
+                                  <span style={{ fontSize: "11px", color: mutedText }}>({topRec.votes} votes{item.recs.length > 1 ? `, +${item.recs.length - 1} alt${item.recs.length > 2 ? "s" : ""}` : ""})</span>
+                                </div>
+                              )
                             ) : (
-                              <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: mutedText, fontStyle: "italic" }}>No recommendations yet — be the first!</p>
+                              <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: mutedText, fontStyle: "italic" }}>{isParentSection ? "No resources yet — add the first one!" : "No recommendations yet — be the first!"}</p>
                             )}
                           </div>
                           <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                             {commentCount > 0 && <span style={{ fontSize: "12px", color: mutedText }}>💬 {commentCount}</span>}
-                            {tipCount > 0 && <span style={{ fontSize: "12px", color: mutedText }}>🔖 {tipCount}</span>}
+                            {tipCount > 0 && <span style={{ fontSize: "12px", color: mutedText }}>✨ {tipCount}</span>}
                             <span style={{ fontSize: "17px", color: accentCol, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block", lineHeight: 1 }}>⌄</span>
                           </div>
                         </div>
@@ -570,12 +589,12 @@ export default function BabyRegistry() {
                             <div style={{ display: "flex", borderBottom: `1px solid ${isRep ? R.border : borderCol}`, background: isRep ? R.dim : cardBg }}>
                               {[
                                 { key: "recs",  label: "Recommendations", badge: item.recs.length },
-                                { key: "tips",  label: "Before you shop",  badge: tipCount },
+                                { key: "tips",  label: "Community Wisdom",  badge: tipCount },
                               ].map(t => {
                                 const isActive = tab === t.key;
                                 return (
                                   <button key={t.key} onClick={e => { e.stopPropagation(); setTab(item.id, t.key); }} style={{ flex: 1, padding: "10px 12px", border: "none", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic", fontSize: "13px", background: isActive ? (isRep ? R.card : cardBg) : "transparent", color: isActive ? textMain : mutedText, fontWeight: isActive ? "600" : "400", borderBottom: isActive ? `2px solid ${accentCol}` : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
-                                    {t.key === "recs" ? "🏆" : "🔖"} {t.label}
+                                    {t.key === "recs" ? "🏆" : "✨"} {t.label}
                                     {t.badge > 0 && <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "10px", background: isActive ? accentCol + "25" : (isRep ? R.border : borderCol), color: isActive ? accentCol : mutedText, fontStyle: "normal" }}>{t.badge}</span>}
                                   </button>
                                 );
@@ -587,26 +606,41 @@ export default function BabyRegistry() {
                               <>
                                 {sorted.map((rec, idx) => {
                                   const myVote = recVotes[rec.id];
+                                  const isHelpful = !!helpfulVotes[rec.id];
                                   const recOpen = expandedRec === rec.id;
                                   const isTop = idx === 0;
-                                  // Option B: show preview only when 1 comment AND panel closed
                                   const showPreview = rec.comments.length === 1 && !recOpen;
                                   return (
                                     <div key={rec.id} style={{ borderBottom: `1px solid ${isRep ? R.border : borderCol}`, background: isTop ? (isRep ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.5)") : "transparent", borderLeft: isRep && isTop ? `3px solid ${R.accent}` : isRep ? `3px solid ${R.border}` : "3px solid transparent" }}>
                                       <div style={{ display: "flex", alignItems: "flex-start", padding: "12px 16px 12px 14px", gap: "10px" }}>
-                                        <div style={{ width: "26px", flexShrink: 0, textAlign: "center", paddingTop: "6px" }}>
-                                          <span style={{ fontSize: idx < 3 ? "17px" : "12px", lineHeight: 1, color: mutedText, fontWeight: "600" }}>{idx < 3 ? MEDAL[idx] : `#${idx + 1}`}</span>
-                                        </div>
-                                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1px", flexShrink: 0, paddingTop: "2px" }}>
-                                          <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "up"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "up" ? accentCol : (isRep ? R.dim : cc + "20"), color: myVote === "up" ? (isRep ? R.bg : "#fff") : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▲</button>
-                                          <span style={{ fontSize: "13.5px", fontWeight: "700", color: rec.votes > 0 ? accentCol : rec.votes < 0 ? "#c47860" : mutedText, minWidth: "22px", textAlign: "center", lineHeight: "1.6" }}>{rec.votes}</span>
-                                          <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "down"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "down" ? "#c47860" : (isRep ? R.dim : cc + "20"), color: myVote === "down" ? "#fff" : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▼</button>
-                                        </div>
+
+                                        {/* Medal (baby/toddler) OR thumbs up (parents) */}
+                                        {isParentSection ? (
+                                          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", flexShrink: 0, paddingTop: "2px", minWidth: "40px" }}>
+                                            <button
+                                              onClick={e => { e.stopPropagation(); handleHelpfulVote(item.id, rec.id); }}
+                                              style={{ width: "34px", height: "34px", borderRadius: "50%", border: `1.5px solid ${isHelpful ? accentCol : isRep ? R.border : borderCol}`, background: isHelpful ? accentCol + "20" : "transparent", color: isHelpful ? accentCol : mutedText, fontSize: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                                              title={isHelpful ? "Remove helpful mark" : "Mark as helpful"}
+                                            >👍</button>
+                                            {rec.votes > 0 && <span style={{ fontSize: "11px", color: isHelpful ? accentCol : mutedText, fontWeight: isHelpful ? "600" : "400" }}>{rec.votes}</span>}
+                                          </div>
+                                        ) : (
+                                          <>
+                                            <div style={{ width: "26px", flexShrink: 0, textAlign: "center", paddingTop: "6px" }}>
+                                              <span style={{ fontSize: idx < 3 ? "17px" : "12px", lineHeight: 1, color: mutedText, fontWeight: "600" }}>{idx < 3 ? MEDAL[idx] : `#${idx + 1}`}</span>
+                                            </div>
+                                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1px", flexShrink: 0, paddingTop: "2px" }}>
+                                              <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "up"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "up" ? accentCol : (isRep ? R.dim : cc + "20"), color: myVote === "up" ? (isRep ? R.bg : "#fff") : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▲</button>
+                                              <span style={{ fontSize: "13.5px", fontWeight: "700", color: rec.votes > 0 ? accentCol : rec.votes < 0 ? "#c47860" : mutedText, minWidth: "22px", textAlign: "center", lineHeight: "1.6" }}>{rec.votes}</span>
+                                              <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "down"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "down" ? "#c47860" : (isRep ? R.dim : cc + "20"), color: myVote === "down" ? "#fff" : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▼</button>
+                                            </div>
+                                          </>
+                                        )}
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                           <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
                                             <span style={{ fontSize: "14.5px", fontWeight: "600", color: textMain }}>{rec.brand}</span>
                                             {rec.model && <span style={{ fontSize: "13px", color: textSub, fontStyle: "italic" }}>{rec.model}</span>}
-                                            {isTop && <span style={{ fontSize: "9.5px", padding: "2px 8px", borderRadius: isRep ? "2px" : "8px", background: accentCol, color: isRep ? R.bg : "#fff", fontWeight: "700", letterSpacing: "0.06em" }}>Top Pick</span>}
+                                            {isTop && !isParentSection && <span style={{ fontSize: "9.5px", padding: "2px 8px", borderRadius: isRep ? "2px" : "8px", background: accentCol, color: isRep ? R.bg : "#fff", fontWeight: "700", letterSpacing: "0.06em" }}>Top Pick</span>}
                                           </div>
                                           {showPreview && <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: textSub, lineHeight: "1.45", fontStyle: "italic" }}>"{rec.comments[0].text}" <span style={{ fontStyle: "normal", fontWeight: "500", color: mutedText }}>— {rec.comments[0].author}</span></p>}
                                         </div>
@@ -647,18 +681,18 @@ export default function BabyRegistry() {
                                 {isRep && <div style={{ padding: "0 18px 8px", opacity: 0.15 }}><SnakeDivider color="white" opacity={1} /></div>}
                                 {addingRecTo === item.id ? (
                                   <div style={{ padding: "14px 18px", borderTop: `1px solid ${isRep ? R.border : borderCol}`, background: isRep ? R.dim : bg }}>
-                                    <p style={{ margin: "0 0 10px", fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic" }}>{isRep ? "🐍 Suggest a brand / model" : "✦ Suggest a brand / model"}</p>
+                                    <p style={{ margin: "0 0 10px", fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic" }}>{isParentSection ? "✦ Add a resource" : isRep ? "🐍 Suggest a brand / model" : "✦ Suggest a brand / model"}</p>
                                     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                                       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                                        <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder="Brand *" style={{ flex: "1 1 120px", padding: "8px 11px", border: `1.5px solid ${accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
-                                        <input value={newModel} onChange={e => setNewModel(e.target.value)} placeholder="Model / version" style={{ flex: "1 1 140px", padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                        <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder={isParentSection ? "Resource name *" : "Brand *"} style={{ flex: "1 1 120px", padding: "8px 11px", border: `1.5px solid ${accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                        <input value={newModel} onChange={e => setNewModel(e.target.value)} placeholder={isParentSection ? "URL (optional)" : "Model / version"} style={{ flex: "1 1 140px", padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
                                       </div>
                                       <input value={newLinkUrl} onChange={e => setNewLinkUrl(e.target.value)} placeholder="Product link (optional, https://...)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
                                       <input value={newLinkLabel} onChange={e => setNewLinkLabel(e.target.value)} placeholder="Retailer name (optional, e.g. Amazon)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
                                       <input value={newNoteAuthor} onChange={e => setNewNoteAuthor(e.target.value)} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, boxSizing: "border-box", fontStyle: "italic" }} />
                                       <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Why do you recommend this? (optional)" rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, resize: "vertical", fontStyle: "italic" }} />
                                       <div style={{ display: "flex", gap: "8px" }}>
-                                        <button onClick={() => submitNewRec(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Add Recommendation</button>
+                                        <button onClick={() => submitNewRec(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>{isParentSection ? "Add Resource" : "Add Recommendation"}</button>
                                         <button onClick={() => { setAddingRecTo(null); setNewBrand(""); setNewModel(""); setNewNote(""); setNewNoteAuthor(""); setNewLinkUrl(""); setNewLinkLabel(""); }} style={{ padding: "9px 14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", background: "transparent", color: textSub, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>Cancel</button>
                                       </div>
                                     </div>
@@ -666,7 +700,7 @@ export default function BabyRegistry() {
                                 ) : (
                                   <div style={{ padding: "11px 18px", borderTop: `1px ${isRep ? "solid" : "dashed"} ${isRep ? R.border : accentCol + "40"}` }}>
                                     <button onClick={e => { e.stopPropagation(); setAddingRecTo(item.id); }} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 16px", borderRadius: isRep ? "2px" : "20px", border: `1.5px ${isRep ? "solid" : "dashed"} ${isRep ? R.borderHi : accentCol + "70"}`, background: "transparent", color: isRep ? R.textSub : accentCol, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: isRep ? "normal" : "italic" }}>
-                                      {isRep ? "🐍 Suggest another pick" : "✦ Suggest another pick"}
+                                      {isParentSection ? "✦ Add a resource" : isRep ? "🐍 Suggest another pick" : "✦ Suggest another pick"}
                                     </button>
                                   </div>
                                 )}
@@ -677,7 +711,7 @@ export default function BabyRegistry() {
                             {tab === "tips" && (
                               <div style={{ padding: "14px 18px" }}>
                                 {(item.tips || []).length === 0 && addingTipTo !== item.id && (
-                                  <p style={{ margin: "0 0 12px", color: mutedText, fontSize: "13px", fontStyle: "italic" }}>No tips yet — be the first to share what you wish you'd known.</p>
+                                  <p style={{ margin: "0 0 12px", color: mutedText, fontSize: "13px", fontStyle: "italic" }}>No wisdom shared yet — be the first.</p>
                                 )}
                                 <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: (item.tips || []).length > 0 ? "14px" : "0" }}>
                                   {(item.tips || []).map((tip, ti) => {
@@ -702,9 +736,9 @@ export default function BabyRegistry() {
                                   <div style={{ borderTop: (item.tips || []).length > 0 ? `1px solid ${isRep ? R.border : borderCol}` : "none", paddingTop: (item.tips || []).length > 0 ? "12px" : "0" }}>
                                     <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
                                       <input value={newTipAuthor} onChange={e => setNewTipAuthor(e.target.value)} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : bg, boxSizing: "border-box", fontStyle: "italic" }} />
-                                      <textarea value={newTipText} onChange={e => setNewTipText(e.target.value)} placeholder={`What do you wish you'd known before buying ${item.name.toLowerCase()}?`} rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : bg, resize: "vertical", fontStyle: "italic" }} />
+                                      <textarea value={newTipText} onChange={e => setNewTipText(e.target.value)} placeholder={`Share your wisdom about ${item.name.toLowerCase()}…`} rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : bg, resize: "vertical", fontStyle: "italic" }} />
                                       <div style={{ display: "flex", gap: "8px" }}>
-                                        <button onClick={() => addTip(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Post tip</button>
+                                        <button onClick={() => addTip(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Post wisdom</button>
                                         <button onClick={() => { setAddingTipTo(null); setNewTipText(""); setNewTipAuthor(""); }} style={{ padding: "9px 14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", background: "transparent", color: textSub, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>Cancel</button>
                                       </div>
                                     </div>
@@ -712,7 +746,7 @@ export default function BabyRegistry() {
                                 ) : (
                                   <div style={{ borderTop: (item.tips || []).length > 0 ? `1px ${isRep ? "solid" : "dashed"} ${isRep ? R.border : accentCol + "40"}` : "none", paddingTop: (item.tips || []).length > 0 ? "11px" : "0" }}>
                                     <button onClick={e => { e.stopPropagation(); setAddingTipTo(item.id); }} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 16px", borderRadius: isRep ? "2px" : "20px", border: `1.5px ${isRep ? "solid" : "dashed"} ${isRep ? R.borderHi : accentCol + "70"}`, background: "transparent", color: isRep ? R.textSub : accentCol, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: isRep ? "normal" : "italic" }}>
-                                      🔖 Add a tip
+                                      ✨ Share wisdom
                                     </button>
                                   </div>
                                 )}
