@@ -250,7 +250,7 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
 export default function BabyRegistry() {
   const [items, setItems]                   = useState([]);
   const [loading, setLoading]               = useState(true);
-  const [activeEra, setActiveEra]           = useState("Reputation");
+  const [activeEra, setActiveEra]           = useState("Taylor Swift");
   const [activeSection, setActiveSection]   = useState("baby");
   const [activeCategory, setActiveCategory] = useState("All");
   const [recVotes, setRecVotes]             = useState({});
@@ -275,7 +275,7 @@ export default function BabyRegistry() {
   const [fabHover, setFabHover]             = useState(false);
   const [helpOpen, setHelpOpen]             = useState(false);
   const [successMsg, setSuccessMsg]         = useState("");
-  const [lyric, setLyric]                   = useState(() => { const l = ERA_LYRICS["Reputation"]; return l[Math.floor(Math.random() * l.length)]; });
+  const [lyric, setLyric]                   = useState(() => { const l = ERA_LYRICS["Taylor Swift"]; return l[Math.floor(Math.random() * l.length)]; });
 
   // ── Era-derived colors ───────────────────────────────────────────────────
   const era         = ERAS.find(e => e.name === activeEra) || ERAS[5];
