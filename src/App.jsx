@@ -34,30 +34,21 @@ const ERA_LYRICS = {
 
 // ── Category config ────────────────────────────────────────────────────────
 const CATEGORY_COLORS = {
-  // Baby
   Sleep: "#7298af", Feeding: "#df9a81", Diapering: "#477760", Transport: "#295ba4",
-  Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing & Comfort": "#e59bc4", "Health & Safety": "#7f2922",
-  // Toddler
-  "Potty Training":              "#477760",
-  "Big Feelings & Social Emotional": "#e59bc4",
-  "Play & Imagination":          "#dccf73",
-  "Toddler Feeding & Nutrition": "#df9a81",
-  "Sleep (Toddler)":             "#7298af",
-  "Books & Learning":            "#c8a951",
-  "Outdoor & Active Play":       "#5a8a73",
-  // Parent
-  "Feeding Support": "#df9a81", "Solids & Starting Foods": "#5a8a73", "Sleep Resources": "#7298af",
-  "Postpartum Recovery": "#e59bc4", "Mental Health & Wellness": "#7f2922", "Parenting Tools & Apps": "#2e4f3f",
-  "Recommended Reading": "#dccf73", "Favorite Shops & Resale": "#df9a81",
-  "Hospital Bag":    "#b8a4c9",
-  "Screen Time & Apps": "#295ba4",
-  "Childcare & Preschool": "#8b6914",
+  Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing & Comfort": "#e59bc4", "Wellness": "#7f2922",
+  "Potty Training": "#477760", "Big Feelings & Social Emotional": "#e59bc4",
+  "Play & Imagination": "#dccf73", "Toddler Feeding & Nutrition": "#df9a81",
+  "Sleep (Toddler)": "#7298af", "Books & Learning": "#c8a951", "Outdoor & Active Play": "#5a8a73",
+  "Hospital Bag": "#b8a4c9", "Feeding Support": "#df9a81", "Solids & Starting Foods": "#5a8a73",
+  "Sleep Resources": "#7298af", "Postpartum Recovery": "#e59bc4", "Mental Health & Wellness": "#7f2922",
+  "Parenting Tools & Apps": "#2e4f3f", "Screen Time & Apps": "#295ba4",
+  "Childcare & Preschool": "#8b6914", "Recommended Reading": "#dccf73", "Favorite Shops & Resale": "#df9a81",
 };
 const catColor = (cat) => CATEGORY_COLORS[cat] || "#df9a81";
 
-const BABY_CATS     = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Health & Safety"];
-const TODDLER_CATS  = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play"];
-const PARENT_CATS   = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale"];
+const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Wellness"];
+const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play"];
+const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale"];
 const BASE_CATEGORIES = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS];
 const MEDAL = ["🥇", "🥈", "🥉"];
 const SPARKLE = "✦";
@@ -97,10 +88,11 @@ function CornerSnake({ flip = false }) {
 function HelpModal({ isOpen, onClose, cardBg, textMain, textSub, mutedText, accentCol, isRep, R }) {
   if (!isOpen) return null;
   const sections = [
-    { icon: "📋", title: "Browse two tabs", body: <><strong style={{ fontWeight: "600" }}>For Baby</strong> has all the gear. <strong style={{ fontWeight: "600" }}>For Parents</strong> has resources, reading, postpartum help, and everything your friends wished they'd told you.</> },
-    { icon: "🏆", title: "Vote for your favorites", body: "Tap any item to expand it and see all brand recommendations. Hit ▲ if you loved it, ▼ if you didn't. The most-loved pick rises to the top and earns the Top Pick badge. It's democracy, but make it baby gear." },
+    { icon: "📋", title: "Browse three sections", body: <><strong style={{ fontWeight: "600" }}>For Baby</strong>, <strong style={{ fontWeight: "600" }}>Toddler</strong>, and <strong style={{ fontWeight: "600" }}>For Parents</strong> — each has its own categories. Filter using the pills below the tabs.</> },
+    { icon: "🏆", title: "Vote for your favorites", body: "Tap any item to expand it. Hit ▲ if you loved it, ▼ if you didn't. The most-loved pick rises to the top. It's democracy, but make it baby gear." },
+    { icon: "🔖", title: "Before you shop tips", body: "Each item has a \"Before you shop\" tab with general advice — things to know before buying anything. Add your own tips there." },
     { icon: "💬", title: "Leave a note", body: "Tap 💬 on any recommendation to share the real talk. Your name is optional. Your opinions are not." },
-    { icon: "✦", title: "Add what's missing", body: <>Hit the <strong style={{ fontWeight: "600" }}>✦ button</strong> bottom-right to add a new item, or tap <strong style={{ fontWeight: "600" }}>"Suggest another brand"</strong> inside any item to add your pick.</> },
+    { icon: "✦", title: "Add what's missing", body: <>Hit the <strong style={{ fontWeight: "600" }}>✦ button</strong> bottom-right to add a new item, or tap <strong style={{ fontWeight: "600" }}>"Suggest another brand"</strong> inside any item.</> },
   ];
   return (
     <>
@@ -131,7 +123,7 @@ function HelpModal({ isOpen, onClose, cardBg, textMain, textSub, mutedText, acce
         <div style={{ borderTop: `1px solid ${accentCol}25`, margin: "0 24px" }} />
         <div style={{ padding: "14px 24px 22px", display: "flex", gap: "10px" }}>
           <span style={{ fontSize: "16px", flexShrink: 0, marginTop: "1px" }}>ℹ️</span>
-          <p style={{ margin: 0, fontSize: "13px", color: mutedText, lineHeight: "1.65", fontStyle: "italic" }}>All changes — votes, comments, and new items — are saved in real time and visible to everyone with this link. Long story short: your recs matter, and they last.</p>
+          <p style={{ margin: 0, fontSize: "13px", color: mutedText, lineHeight: "1.65", fontStyle: "italic" }}>All changes — votes, tips, comments, and new items — are saved in real time and visible to everyone with this link. Long story short: your recs matter, and they last.</p>
         </div>
       </div>
     </>
@@ -167,7 +159,6 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
   const finalCategory = isNewCat ? newCatName.trim() : selectedCat;
   const cc = catColor(finalCategory) || accentCol;
   const canProceed = itemName.trim() && finalCategory;
-
   const iStyle = { width: "100%", padding: "10px 13px", border: `1.5px solid ${isRep ? R.border : "#e8e6e2"}`, borderRadius: isRep ? "4px" : "12px", fontSize: "14px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : "#fff", boxSizing: "border-box", transition: "border-color 0.15s", fontStyle: "italic" };
   const lStyle = { display: "block", fontSize: "11px", fontWeight: "600", color: mutedText, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "5px" };
 
@@ -175,10 +166,7 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
     if (!canProceed) return;
     const recId = `r-${Date.now()}`;
     const hasBrand = brand.trim() || model.trim();
-    onAdd({
-      id: Date.now(), category: finalCategory, name: itemName.trim(),
-      recs: hasBrand ? [{ id: recId, brand: brand.trim(), model: model.trim(), votes: 1, link_url: linkUrl.trim() || null, link_label: linkLabel.trim() || null, comments: note.trim() ? [{ id: Date.now(), author: author.trim() || "Anonymous", text: note.trim(), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }) }] : [] }] : [],
-    });
+    onAdd({ id: Date.now(), category: finalCategory, name: itemName.trim(), tips: [], recs: hasBrand ? [{ id: recId, brand: brand.trim(), model: model.trim(), votes: 1, link_url: linkUrl.trim() || null, link_label: linkLabel.trim() || null, comments: note.trim() ? [{ id: Date.now(), author: author.trim() || "Anonymous", text: note.trim(), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }) }] : [] }] : [] });
     onClose();
   };
 
@@ -199,7 +187,6 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
         <div style={{ height: "3px", background: isRep ? R.border : accentCol + "25" }}>
           <div style={{ height: "100%", width: step === 1 ? "50%" : "100%", background: accentCol, borderRadius: "0 2px 2px 0", transition: "width 0.35s ease" }} />
         </div>
-
         <div style={{ padding: "18px 22px 24px" }}>
           {step === 1 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -268,9 +255,14 @@ export default function BabyRegistry() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [recVotes, setRecVotes]             = useState({});
   const [expandedItem, setExpandedItem]     = useState(null);
+  const [activeTab, setActiveTab]           = useState({});       // { [itemId]: "recs" | "tips" }
   const [expandedRec, setExpandedRec]       = useState(null);
   const [newComment, setNewComment]         = useState({});
   const [commentAuthor, setCommentAuthor]   = useState({});
+  const [addingTipTo, setAddingTipTo]       = useState(null);
+  const [newTipText, setNewTipText]         = useState("");
+  const [newTipAuthor, setNewTipAuthor]     = useState("");
+  const [newTipSuccess, setNewTipSuccess]   = useState(null);    // itemId of just-posted tip
   const [sortBy, setSortBy]                 = useState("category");
   const [addingRecTo, setAddingRecTo]       = useState(null);
   const [newBrand, setNewBrand]             = useState("");
@@ -286,23 +278,22 @@ export default function BabyRegistry() {
   const [lyric, setLyric]                   = useState(() => { const l = ERA_LYRICS["Reputation"]; return l[Math.floor(Math.random() * l.length)]; });
 
   // ── Era-derived colors ───────────────────────────────────────────────────
-  const era       = ERAS.find(e => e.name === activeEra) || ERAS[5];
-  const isRep     = activeEra === "Reputation";
-  const isShowgirl = activeEra === "The Life of a Showgirl";
-  const isDark    = ["Midnights"].includes(activeEra);
+  const era         = ERAS.find(e => e.name === activeEra) || ERAS[5];
+  const isRep       = activeEra === "Reputation";
+  const isShowgirl  = activeEra === "The Life of a Showgirl";
+  const isDark      = ["Midnights"].includes(activeEra);
   const isMidnights = activeEra === "Midnights";
-
   const R = { bg: "#080808", card: "#111111", border: "#2a2a2a", borderHi: "#555555", textMain: "#f0f0f0", textSub: "#909090", textMuted: "#444444", accent: "#e8e8e8", dim: "#1a1a1a" };
 
-  const lightCardBg = (() => { const hex = era.accent.replace("#",""); const r=parseInt(hex.slice(0,2),16), g=parseInt(hex.slice(2,4),16), b=parseInt(hex.slice(4,6),16); const bl=(c)=>Math.round(c*0.35+255*0.65); return `rgb(${bl(r)},${bl(g)},${bl(b)})`; })();
+  const lightCardBg = (() => { const hex = era.accent.replace("#",""); const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16); const bl=(c)=>Math.round(c*0.35+255*0.65); return `rgb(${bl(r)},${bl(g)},${bl(b)})`; })();
 
-  const bg        = isRep ? R.bg        : isShowgirl ? "#d6f0ee" : isDark ? "#0a0a12" : era.accent;
-  const cardBg    = isRep ? R.card      : isShowgirl ? "#eaf8f6" : isDark ? "#12121e" : lightCardBg;
-  const textMain  = isRep ? R.textMain  : isShowgirl ? "#1a3a38" : isDark ? "#ddd8f0" : "#1a0a2e";
-  const textSub   = isRep ? R.textSub   : isShowgirl ? "#4a8a84" : isMidnights ? "#a8aed8" : isDark ? "#8880a8" : "#6a5a7a";
-  const borderCol = isRep ? R.border    : isShowgirl ? "#a8ddd8" : isDark ? "#2a2540" : era.color + "40";
-  const mutedText = isRep ? R.textMuted : isShowgirl ? "#80bab5" : isMidnights ? "#6870a8" : isDark ? "#4a4060" : "#b0a0c0";
-  const accentCol = isRep ? R.accent    : isMidnights ? "#7880c8" : era.color;
+  const bg        = isRep ? R.bg       : isShowgirl ? "#d6f0ee" : isDark ? "#0a0a12" : era.accent;
+  const cardBg    = isRep ? R.card     : isShowgirl ? "#eaf8f6" : isDark ? "#12121e" : lightCardBg;
+  const textMain  = isRep ? R.textMain : isShowgirl ? "#1a3a38" : isDark ? "#ddd8f0" : "#1a0a2e";
+  const textSub   = isRep ? R.textSub  : isShowgirl ? "#4a8a84" : isMidnights ? "#a8aed8" : isDark ? "#8880a8" : "#6a5a7a";
+  const borderCol = isRep ? R.border   : isShowgirl ? "#a8ddd8" : isDark ? "#2a2540" : era.color + "40";
+  const mutedText = isRep ? R.textMuted: isShowgirl ? "#80bab5" : isMidnights ? "#6870a8" : isDark ? "#4a4060" : "#b0a0c0";
+  const accentCol = isRep ? R.accent   : isMidnights ? "#7880c8" : era.color;
 
   const handleEraChange = (eraName) => {
     const lyrics = ERA_LYRICS[eraName] || [];
@@ -310,18 +301,23 @@ export default function BabyRegistry() {
     setActiveEra(eraName);
   };
 
+  const getTab = (itemId) => activeTab[itemId] || "recs";
+  const setTab = (itemId, tab) => setActiveTab(t => ({ ...t, [itemId]: tab }));
+
   // ── Supabase data load ───────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [{ data: itemRows }, { data: recRows }, { data: commentRows }] = await Promise.all([
+      const [{ data: itemRows }, { data: recRows }, { data: commentRows }, { data: tipRows }] = await Promise.all([
         supabase.from("items").select("*").order("id"),
         supabase.from("recs").select("*").order("votes", { ascending: false }),
         supabase.from("comments").select("*").order("created_at"),
+        supabase.from("item_tips").select("*").order("created_at"),
       ]);
       const commentsByRec = (commentRows || []).reduce((acc, c) => { if (!acc[c.rec_id]) acc[c.rec_id] = []; acc[c.rec_id].push(c); return acc; }, {});
       const recsByItem    = (recRows || []).reduce((acc, r) => { if (!acc[r.item_id]) acc[r.item_id] = []; acc[r.item_id].push({ ...r, comments: commentsByRec[r.id] || [] }); return acc; }, {});
-      setItems((itemRows || []).map(item => ({ ...item, recs: recsByItem[item.id] || [] })));
+      const tipsByItem    = (tipRows || []).reduce((acc, t) => { if (!acc[t.item_id]) acc[t.item_id] = []; acc[t.item_id].push(t); return acc; }, {});
+      setItems((itemRows || []).map(item => ({ ...item, recs: recsByItem[item.id] || [], tips: tipsByItem[item.id] || [] })));
     } catch (err) { console.error("Failed to load registry data:", err); }
     finally { setLoading(false); }
   }, []);
@@ -329,7 +325,7 @@ export default function BabyRegistry() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleAddItem = async (newItem) => {
-    setItems(its => [...its, newItem]);
+    setItems(its => [...its, { ...newItem, tips: [] }]);
     const isParentCat  = PARENT_CATS.includes(newItem.category);
     const isToddlerCat = TODDLER_CATS.includes(newItem.category);
     setActiveSection(isParentCat ? "parents" : isToddlerCat ? "toddler" : "baby");
@@ -358,7 +354,8 @@ export default function BabyRegistry() {
   };
 
   const addComment = async (itemId, recId) => {
-    const text = (newComment[recId] || "").trim(); const author = (commentAuthor[recId] || "").trim() || "Anonymous";
+    const text = (newComment[recId] || "").trim();
+    const author = (commentAuthor[recId] || "").trim() || "Anonymous";
     if (!text) return;
     const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
     const comment = { id: Date.now(), rec_id: recId, author, text, date };
@@ -366,6 +363,19 @@ export default function BabyRegistry() {
     setNewComment(n => ({ ...n, [recId]: "" })); setCommentAuthor(n => ({ ...n, [recId]: "" }));
     try { await supabase.from("comments").insert({ rec_id: recId, author, text, date }); }
     catch (err) { console.error("Comment failed:", err); }
+  };
+
+  const addTip = async (itemId) => {
+    const text = newTipText.trim();
+    const author = newTipAuthor.trim() || "Anonymous";
+    if (!text) return;
+    const date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const tip = { id: Date.now(), item_id: itemId, author, text, date };
+    setItems(its => its.map(item => item.id !== itemId ? item : { ...item, tips: [...(item.tips || []), tip] }));
+    setNewTipText(""); setNewTipAuthor(""); setAddingTipTo(null);
+    setNewTipSuccess(itemId); setTimeout(() => setNewTipSuccess(null), 3000);
+    try { await supabase.from("item_tips").insert({ item_id: itemId, author, text, date }); }
+    catch (err) { console.error("Tip failed:", err); }
   };
 
   const submitNewRec = async (itemId) => {
@@ -384,10 +394,8 @@ export default function BabyRegistry() {
 
   const sortedRecs = (recs) => [...recs].sort((a, b) => b.votes - a.votes);
   const allCategories = [...new Set([...BASE_CATEGORIES, ...items.map(i => i.category)])];
-  const sectionCats = activeSection === "baby"
-    ? allCategories.filter(c => BABY_CATS.includes(c))
-    : activeSection === "toddler"
-    ? allCategories.filter(c => TODDLER_CATS.includes(c))
+  const sectionCats = activeSection === "baby" ? allCategories.filter(c => BABY_CATS.includes(c))
+    : activeSection === "toddler" ? allCategories.filter(c => TODDLER_CATS.includes(c))
     : allCategories.filter(c => PARENT_CATS.includes(c));
   const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
   const displayCategories = ["All", ...sectionCats];
@@ -402,14 +410,13 @@ export default function BabyRegistry() {
     <div style={{ minHeight: "100vh", background: bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Palatino Linotype', Palatino, serif", gap: "16px" }}>
       <div style={{ fontSize: "44px", animation: "spin 2s linear infinite" }}>🍼</div>
       <p style={{ color: textSub, fontSize: "15px", fontStyle: "italic" }}>Loading registry…</p>
-      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
 
   return (
     <div className="registry-root" style={{ minHeight: "100vh", background: bg, fontFamily: "'Palatino Linotype', Palatino, serif", transition: "background 0.5s ease", position: "relative" }}>
 
-      {/* ── Reputation background snakes ── */}
       {isRep && (
         <>
           <BackgroundSnake />
@@ -418,8 +425,6 @@ export default function BabyRegistry() {
           </svg>
         </>
       )}
-
-      {/* ── Other era sparkles ── */}
       {!isRep && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
           {[...Array(10)].map((_, i) => (
@@ -432,70 +437,48 @@ export default function BabyRegistry() {
 
         {/* ── Header ── */}
         <div style={{ background: isRep ? "rgba(8,8,8,0.95)" : isDark ? "rgba(10,10,18,0.85)" : "rgba(255,255,255,0.35)", backdropFilter: "blur(12px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "30"}`, padding: "44px 24px 28px", textAlign: "center", position: "relative" }}>
-
-          {/* Era picker */}
           <div style={{ display: "flex", justifyContent: "center", gap: "6px", flexWrap: "wrap", marginBottom: "24px" }}>
             {ERAS.map(e => { const isActive = activeEra === e.name; const btnColor = e.name === "Reputation" ? "#e8e8e8" : e.color; return (
               <button key={e.name} onClick={() => handleEraChange(e.name)} style={{ padding: "4px 12px", borderRadius: "20px", border: `1.5px solid ${isActive ? btnColor : "transparent"}`, background: isActive ? btnColor + "22" : "transparent", color: isActive ? btnColor : mutedText, fontSize: "11px", cursor: "pointer", fontFamily: "inherit", fontWeight: isActive ? "600" : "400", transition: "all 0.2s", whiteSpace: "nowrap" }}>{e.name}</button>
             ); })}
           </div>
-
-          {/* Help button */}
           <button onClick={() => setHelpOpen(true)} style={{ position: "absolute", top: "16px", right: "16px", width: "36px", height: "36px", borderRadius: "50%", border: `1.5px solid ${isRep ? R.borderHi : accentCol + "60"}`, background: isRep ? R.dim : accentCol + "20", color: isRep ? R.textMain : accentCol, fontSize: "15px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center" }} title="How to use this">?</button>
-
-          {/* Era snake divider */}
           {isRep && (
             <div style={{ position: "relative", height: "18px", overflow: "visible", marginBottom: "4px" }}>
               <svg viewBox="0 0 800 18" preserveAspectRatio="none" style={{ width: "100%", height: "18px", display: "block" }}>
                 <path d="M18,9 C60,1 100,17 140,9 C180,1 220,17 260,9 C300,1 340,17 380,9 C420,1 460,17 500,9 C540,1 580,17 620,9 C660,1 700,17 740,9 C760,4 775,9 782,9" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
-                <ellipse cx="788" cy="9" rx="9" ry="6" fill="white" opacity="0.35" />
-                <circle cx="785" cy="6.5" r="1.5" fill="#050505" opacity="0.8" /><circle cx="791" cy="6.5" r="1.5" fill="#050505" opacity="0.8" />
+                <ellipse cx="788" cy="9" rx="9" ry="6" fill="white" opacity="0.35" /><circle cx="785" cy="6.5" r="1.5" fill="#050505" opacity="0.8" /><circle cx="791" cy="6.5" r="1.5" fill="#050505" opacity="0.8" />
                 <path d="M797,9 L801,6.5 M797,9 L801,11.5" stroke="white" strokeWidth="1" fill="none" opacity="0.35" />
                 <path d="M18,9 C10,9 4,8 0,9" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.2" />
               </svg>
             </div>
           )}
-
-          {/* Title */}
           <div style={{ fontSize: "13px", letterSpacing: "0.25em", color: accentCol, textTransform: "uppercase", marginBottom: "10px", fontStyle: "italic" }}>
             {isRep ? "𝕿𝖍𝖊 𝕽𝖊𝖕𝖚𝖙𝖆𝖙𝖎𝖔𝖓 𝕰𝖗𝖆" : <><span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` The ${activeEra} Era `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span></>}
           </div>
           <h1 style={{ margin: "0 0 5px", fontSize: "clamp(32px, 7vw, 58px)", fontWeight: "400", color: textMain, fontStyle: "italic", lineHeight: 1.1 }}>Our Parenting Era</h1>
           <div style={{ fontSize: "13px", color: accentCol, marginTop: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{lyric}</div>
-
           <p style={{ margin: "14px 0 20px", color: textSub, fontSize: "14px", fontStyle: "italic" }}>Community-ranked recommendations — vote for your favorites</p>
-
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
             <option value="category">Sort by Category</option>
             <option value="votes">Sort by Most Loved</option>
           </select>
         </div>
 
-        {/* ── Era strip ── */}
         {!isRep && <div style={{ height: "3px", background: `linear-gradient(90deg, transparent, ${accentCol}, ${accentCol}88, transparent)` }} />}
 
-        {/* ── Sticky nav: section tabs + category pills ── */}
+        {/* ── Sticky nav ── */}
         {(() => {
-          // Derive a solid (slightly opaque) version of the era background for the sticky bar
-          const stickyBg = isRep       ? "#0d0d0d"
-                         : isDark      ? "#0e0e1a"
-                         : isShowgirl  ? "#c8eeeb"
-                         : era.accent; // era.accent is already a solid light color per era
+          const stickyBg = isRep ? "#0d0d0d" : isDark ? "#0e0e1a" : isShowgirl ? "#c8eeeb" : era.accent;
           return (
             <div style={{ position: "sticky", top: 0, zIndex: 30, boxShadow: `0 2px 12px ${isRep ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.1)"}` }}>
-              {/* Section switcher */}
               <div style={{ background: stickyBg, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "30"}`, padding: "10px 16px", display: "flex", justifyContent: "center" }}>
                 <div style={{ display: "inline-flex", borderRadius: "30px", border: `1.5px solid ${isRep ? R.borderHi : accentCol + "50"}`, overflow: "hidden", background: isRep ? "rgba(30,30,30,0.8)" : "rgba(255,255,255,0.15)" }}>
-                  {[
-                    { key: "baby",    label: "👶 For Baby" },
-                    { key: "toddler", label: "🧒 Toddler" },
-                    { key: "parents", label: "🧡 For Parents" },
-                  ].map(s => (
+                  {[{ key: "baby", label: "👶 For Baby" }, { key: "toddler", label: "🧒 Toddler" }, { key: "parents", label: "🧡 For Parents" }].map(s => (
                     <button key={s.key} onClick={() => { setActiveSection(s.key); setActiveCategory("All"); }} style={{ padding: "9px 18px", border: "none", cursor: "pointer", background: activeSection === s.key ? accentCol : "transparent", color: activeSection === s.key ? (isRep ? R.bg : "#fff") : textSub, fontSize: "13.5px", fontFamily: "inherit", fontWeight: activeSection === s.key ? "600" : "400", transition: "all 0.2s", whiteSpace: "nowrap" }}>{s.label}</button>
                   ))}
                 </div>
               </div>
-              {/* Category pills */}
               <div style={{ background: stickyBg, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: `1px solid ${isRep ? R.border : accentCol + "25"}`, padding: "8px 16px", overflowX: "auto" }}>
                 <div style={{ display: "flex", gap: "7px", minWidth: "max-content", margin: "0 auto", maxWidth: "960px" }}>
                   {displayCategories.map(cat => { const cc = cat === "All" ? accentCol : catColor(cat); const active = activeCategory === cat;
@@ -507,6 +490,7 @@ export default function BabyRegistry() {
           );
         })()}
 
+        {/* ── Section label ── */}
         <div style={{ maxWidth: "960px", margin: "0 auto", padding: "22px 16px 0", textAlign: "center" }}>
           {isRep ? (
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
@@ -545,11 +529,15 @@ export default function BabyRegistry() {
                     const sorted = sortedRecs(item.recs);
                     const isOpen = expandedItem === item.id;
                     const topRec = sorted[0];
+                    const tipCount = (item.tips || []).length;
+                    const commentCount = totalComments(item);
+                    const tab = getTab(item.id);
+
                     return (
                       <div key={item.id} style={{ background: cardBg, borderRadius: isRep ? "6px" : "16px", border: `1.5px solid ${isOpen ? (isRep ? R.borderHi : cc + "80") : (isRep ? R.border : borderCol)}`, overflow: "hidden", boxShadow: isOpen ? (isRep ? "0 0 0 1px #444, 0 8px 32px rgba(0,0,0,0.8)" : `0 6px 28px ${cc}22`) : (isRep ? "0 2px 8px rgba(0,0,0,0.6)" : "0 1px 5px rgba(0,0,0,0.06)"), transition: "box-shadow 0.2s", position: "relative" }}>
-
                         {isRep && isOpen && <><CornerSnake /><CornerSnake flip={true} /></>}
 
+                        {/* Card header */}
                         <div onClick={() => { setExpandedItem(isOpen ? null : item.id); if (!isOpen) setAddingRecTo(null); }} style={{ display: "flex", alignItems: "center", padding: "14px 18px", gap: "12px", cursor: "pointer", userSelect: "none" }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
@@ -566,104 +554,168 @@ export default function BabyRegistry() {
                               <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: mutedText, fontStyle: "italic" }}>No recommendations yet — be the first!</p>
                             )}
                           </div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
-                            {totalComments(item) > 0 && <span style={{ fontSize: "12px", color: mutedText }}>💬 {totalComments(item)}</span>}
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                            {commentCount > 0 && <span style={{ fontSize: "12px", color: mutedText }}>💬 {commentCount}</span>}
+                            {tipCount > 0 && <span style={{ fontSize: "12px", color: mutedText }}>🔖 {tipCount}</span>}
                             <span style={{ fontSize: "17px", color: accentCol, transform: isOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", display: "inline-block", lineHeight: 1 }}>⌄</span>
                           </div>
                         </div>
 
+                        {/* Expanded area */}
                         {isOpen && (
                           <div style={{ borderTop: `1px solid ${isRep ? R.border : borderCol}` }}>
                             {isRep && <div style={{ padding: "8px 18px 0", opacity: 0.2 }}><SnakeDivider color="white" opacity={1} /></div>}
 
-                            {sorted.map((rec, idx) => {
-                              const myVote = recVotes[rec.id];
-                              const recOpen = expandedRec === rec.id;
-                              const isTop = idx === 0;
-                              return (
-                                <div key={rec.id} style={{ borderBottom: `1px solid ${isRep ? R.border : borderCol}`, background: isTop ? (isRep ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.5)") : "transparent", borderLeft: isRep && isTop ? `3px solid ${R.accent}` : isRep ? `3px solid ${R.border}` : "3px solid transparent" }}>
-                                  <div style={{ display: "flex", alignItems: "flex-start", padding: "12px 16px 12px 14px", gap: "10px" }}>
-                                    <div style={{ width: "26px", flexShrink: 0, textAlign: "center", paddingTop: "6px" }}>
-                                      <span style={{ fontSize: idx < 3 ? "17px" : "12px", lineHeight: 1, color: mutedText, fontWeight: "600" }}>{idx < 3 ? MEDAL[idx] : `#${idx + 1}`}</span>
-                                    </div>
-                                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1px", flexShrink: 0, paddingTop: "2px" }}>
-                                      <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "up"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "up" ? accentCol : (isRep ? R.dim : cc + "20"), color: myVote === "up" ? (isRep ? R.bg : "#fff") : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▲</button>
-                                      <span style={{ fontSize: "13.5px", fontWeight: "700", color: rec.votes > 0 ? accentCol : rec.votes < 0 ? "#c47860" : mutedText, minWidth: "22px", textAlign: "center", lineHeight: "1.6" }}>{rec.votes}</span>
-                                      <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "down"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "down" ? "#c47860" : (isRep ? R.dim : cc + "20"), color: myVote === "down" ? "#fff" : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▼</button>
-                                    </div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
-                                        <span style={{ fontSize: "14.5px", fontWeight: "600", color: textMain }}>{rec.brand}</span>
-                                        {rec.model && <span style={{ fontSize: "13px", color: textSub, fontStyle: "italic" }}>{rec.model}</span>}
-                                        {isTop && <span style={{ fontSize: "9.5px", padding: "2px 8px", borderRadius: isRep ? "2px" : "8px", background: accentCol, color: isRep ? R.bg : "#fff", fontWeight: "700", letterSpacing: "0.06em" }}>Top Pick</span>}
+                            {/* ── Tab bar ── */}
+                            <div style={{ display: "flex", borderBottom: `1px solid ${isRep ? R.border : borderCol}`, background: isRep ? R.dim : cardBg }}>
+                              {[
+                                { key: "recs",  label: "Recommendations", badge: item.recs.length },
+                                { key: "tips",  label: "Before you shop",  badge: tipCount },
+                              ].map(t => {
+                                const isActive = tab === t.key;
+                                return (
+                                  <button key={t.key} onClick={e => { e.stopPropagation(); setTab(item.id, t.key); }} style={{ flex: 1, padding: "10px 12px", border: "none", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic", fontSize: "13px", background: isActive ? (isRep ? R.card : cardBg) : "transparent", color: isActive ? textMain : mutedText, fontWeight: isActive ? "600" : "400", borderBottom: isActive ? `2px solid ${accentCol}` : "2px solid transparent", transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}>
+                                    {t.key === "recs" ? "🏆" : "🔖"} {t.label}
+                                    {t.badge > 0 && <span style={{ fontSize: "10px", padding: "1px 6px", borderRadius: "10px", background: isActive ? accentCol + "25" : (isRep ? R.border : borderCol), color: isActive ? accentCol : mutedText, fontStyle: "normal" }}>{t.badge}</span>}
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {/* ── Recommendations tab ── */}
+                            {tab === "recs" && (
+                              <>
+                                {sorted.map((rec, idx) => {
+                                  const myVote = recVotes[rec.id];
+                                  const recOpen = expandedRec === rec.id;
+                                  const isTop = idx === 0;
+                                  // Option B: show preview only when 1 comment AND panel closed
+                                  const showPreview = rec.comments.length === 1 && !recOpen;
+                                  return (
+                                    <div key={rec.id} style={{ borderBottom: `1px solid ${isRep ? R.border : borderCol}`, background: isTop ? (isRep ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.5)") : "transparent", borderLeft: isRep && isTop ? `3px solid ${R.accent}` : isRep ? `3px solid ${R.border}` : "3px solid transparent" }}>
+                                      <div style={{ display: "flex", alignItems: "flex-start", padding: "12px 16px 12px 14px", gap: "10px" }}>
+                                        <div style={{ width: "26px", flexShrink: 0, textAlign: "center", paddingTop: "6px" }}>
+                                          <span style={{ fontSize: idx < 3 ? "17px" : "12px", lineHeight: 1, color: mutedText, fontWeight: "600" }}>{idx < 3 ? MEDAL[idx] : `#${idx + 1}`}</span>
+                                        </div>
+                                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1px", flexShrink: 0, paddingTop: "2px" }}>
+                                          <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "up"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "up" ? accentCol : (isRep ? R.dim : cc + "20"), color: myVote === "up" ? (isRep ? R.bg : "#fff") : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▲</button>
+                                          <span style={{ fontSize: "13.5px", fontWeight: "700", color: rec.votes > 0 ? accentCol : rec.votes < 0 ? "#c47860" : mutedText, minWidth: "22px", textAlign: "center", lineHeight: "1.6" }}>{rec.votes}</span>
+                                          <button onClick={e => { e.stopPropagation(); handleRecVote(item.id, rec.id, "down"); }} style={{ width: "28px", height: "24px", border: "none", borderRadius: isRep ? "2px" : "7px", cursor: "pointer", fontSize: "11px", background: myVote === "down" ? "#c47860" : (isRep ? R.dim : cc + "20"), color: myVote === "down" ? "#fff" : textSub, transition: "all 0.15s", display: "flex", alignItems: "center", justifyContent: "center" }}>▼</button>
+                                        </div>
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+                                            <span style={{ fontSize: "14.5px", fontWeight: "600", color: textMain }}>{rec.brand}</span>
+                                            {rec.model && <span style={{ fontSize: "13px", color: textSub, fontStyle: "italic" }}>{rec.model}</span>}
+                                            {isTop && <span style={{ fontSize: "9.5px", padding: "2px 8px", borderRadius: isRep ? "2px" : "8px", background: accentCol, color: isRep ? R.bg : "#fff", fontWeight: "700", letterSpacing: "0.06em" }}>Top Pick</span>}
+                                          </div>
+                                          {showPreview && <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: textSub, lineHeight: "1.45", fontStyle: "italic" }}>"{rec.comments[0].text}" <span style={{ fontStyle: "normal", fontWeight: "500", color: mutedText }}>— {rec.comments[0].author}</span></p>}
+                                        </div>
+                                        {rec.link_url && (
+                                          <a href={rec.link_url} target="_blank" rel="noopener noreferrer" style={{ padding: "5px 10px", borderRadius: isRep ? "2px" : "14px", border: `1px solid ${isRep ? R.borderHi : accentCol + "70"}`, background: isRep ? R.dim : accentCol + "15", color: isRep ? R.textMain : accentCol, fontSize: "12px", cursor: "pointer", flexShrink: 0, textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", fontFamily: "inherit", fontStyle: "italic", whiteSpace: "nowrap" }}>
+                                            🛍 {rec.link_label || "Shop"}
+                                          </a>
+                                        )}
+                                        <button onClick={e => { e.stopPropagation(); setExpandedRec(recOpen ? null : rec.id); }} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "5px 10px", borderRadius: isRep ? "2px" : "14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, background: recOpen ? (isRep ? R.dim : accentCol + "15") : "transparent", color: textSub, fontSize: "12px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>💬 {rec.comments.length}</button>
                                       </div>
-                                      {rec.comments.length > 0 && <p style={{ margin: "4px 0 0", fontSize: "12.5px", color: textSub, lineHeight: "1.45", fontStyle: "italic" }}>"{rec.comments[0].text}" <span style={{ fontStyle: "normal", fontWeight: "500", color: mutedText }}>— {rec.comments[0].author}</span></p>}
-                                    </div>
-
-                                    {rec.link_url && (
-                                      <a href={rec.link_url} target="_blank" rel="noopener noreferrer" style={{ padding: "5px 10px", borderRadius: isRep ? "2px" : "14px", border: `1px solid ${isRep ? R.borderHi : accentCol + "70"}`, background: isRep ? R.dim : accentCol + "15", color: isRep ? R.textMain : accentCol, fontSize: "12px", cursor: "pointer", flexShrink: 0, textDecoration: "none", display: "flex", alignItems: "center", gap: "4px", fontFamily: "inherit", fontStyle: "italic", whiteSpace: "nowrap" }}>
-                                        🛍 {rec.link_label || "Shop"}
-                                      </a>
-                                    )}
-
-                                    <button onClick={e => { e.stopPropagation(); setExpandedRec(recOpen ? null : rec.id); }} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "5px 10px", borderRadius: isRep ? "2px" : "14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, background: recOpen ? (isRep ? R.dim : accentCol + "15") : "transparent", color: textSub, fontSize: "12px", cursor: "pointer", fontFamily: "inherit", flexShrink: 0 }}>💬 {rec.comments.length}</button>
-                                  </div>
-
-                                  {recOpen && (
-                                    <div style={{ background: isRep ? R.bg : cardBg, borderTop: `1px solid ${isRep ? R.border : borderCol}`, padding: "13px 16px 14px 70px" }}>
-                                      {rec.comments.length === 0 ? <p style={{ margin: "0 0 11px", color: mutedText, fontSize: "13px", fontStyle: "italic" }}>No notes yet — share why you love this one!</p> : (
-                                        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "13px" }}>
-                                          {rec.comments.map(c => (
-                                            <div key={c.id} style={{ background: isRep ? R.dim : bg + "80", borderRadius: "10px", padding: "9px 13px", border: `1px solid ${isRep ? R.border : borderCol}` }}>
-                                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
-                                                <span style={{ fontSize: "12.5px", fontWeight: "600", color: textMain }}>{c.author}</span>
-                                                <span style={{ fontSize: "11.5px", color: mutedText }}>{c.date}</span>
-                                              </div>
-                                              <p style={{ margin: 0, fontSize: "13.5px", color: textSub, lineHeight: "1.5", fontStyle: "italic" }}>{c.text}</p>
+                                      {recOpen && (
+                                        <div style={{ background: isRep ? R.bg : cardBg, borderTop: `1px solid ${isRep ? R.border : borderCol}`, padding: "13px 16px 14px 70px" }}>
+                                          {rec.comments.length === 0 ? <p style={{ margin: "0 0 11px", color: mutedText, fontSize: "13px", fontStyle: "italic" }}>No notes yet — share why you love this one!</p> : (
+                                            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "13px" }}>
+                                              {rec.comments.map(c => (
+                                                <div key={c.id} style={{ background: isRep ? R.dim : bg + "80", borderRadius: "10px", padding: "9px 13px", border: `1px solid ${isRep ? R.border : borderCol}` }}>
+                                                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                                                    <span style={{ fontSize: "12.5px", fontWeight: "600", color: textMain }}>{c.author}</span>
+                                                    <span style={{ fontSize: "11.5px", color: mutedText }}>{c.date}</span>
+                                                  </div>
+                                                  <p style={{ margin: 0, fontSize: "13.5px", color: textSub, lineHeight: "1.5", fontStyle: "italic" }}>{c.text}</p>
+                                                </div>
+                                              ))}
                                             </div>
-                                          ))}
+                                          )}
+                                          <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                                            <input value={commentAuthor[rec.id] || ""} onChange={e => setCommentAuthor(n => ({ ...n, [rec.id]: e.target.value }))} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", background: isRep ? R.bg : bg, outline: "none", color: textMain, boxSizing: "border-box", fontStyle: "italic" }} />
+                                            <div style={{ display: "flex", gap: "7px" }}>
+                                              <input value={newComment[rec.id] || ""} onChange={e => setNewComment(n => ({ ...n, [rec.id]: e.target.value }))} onKeyDown={e => e.key === "Enter" && addComment(item.id, rec.id)} placeholder="Why do you love this one?" style={{ flex: 1, padding: "8px 12px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", background: isRep ? R.bg : bg, outline: "none", color: textMain, fontStyle: "italic" }} />
+                                              <button onClick={() => addComment(item.id, rec.id)} style={{ padding: "8px 15px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", flexShrink: 0 }}>Post</button>
+                                            </div>
+                                          </div>
                                         </div>
                                       )}
-                                      <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                                        <input value={commentAuthor[rec.id] || ""} onChange={e => setCommentAuthor(n => ({ ...n, [rec.id]: e.target.value }))} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", background: isRep ? R.bg : bg, outline: "none", color: textMain, boxSizing: "border-box", fontStyle: "italic" }} />
-                                        <div style={{ display: "flex", gap: "7px" }}>
-                                          <input value={newComment[rec.id] || ""} onChange={e => setNewComment(n => ({ ...n, [rec.id]: e.target.value }))} onKeyDown={e => e.key === "Enter" && addComment(item.id, rec.id)} placeholder="Why do you love this one?" style={{ flex: 1, padding: "8px 12px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", background: isRep ? R.bg : bg, outline: "none", color: textMain, fontStyle: "italic" }} />
-                                          <button onClick={() => addComment(item.id, rec.id)} style={{ padding: "8px 15px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", flexShrink: 0 }}>Post</button>
-                                        </div>
+                                    </div>
+                                  );
+                                })}
+                                {isRep && <div style={{ padding: "0 18px 8px", opacity: 0.15 }}><SnakeDivider color="white" opacity={1} /></div>}
+                                {addingRecTo === item.id ? (
+                                  <div style={{ padding: "14px 18px", borderTop: `1px solid ${isRep ? R.border : borderCol}`, background: isRep ? R.dim : bg }}>
+                                    <p style={{ margin: "0 0 10px", fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic" }}>{isRep ? "🐍 Suggest a brand / model" : "✦ Suggest a brand / model"}</p>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                                        <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder="Brand *" style={{ flex: "1 1 120px", padding: "8px 11px", border: `1.5px solid ${accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                        <input value={newModel} onChange={e => setNewModel(e.target.value)} placeholder="Model / version" style={{ flex: "1 1 140px", padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                      </div>
+                                      <input value={newLinkUrl} onChange={e => setNewLinkUrl(e.target.value)} placeholder="Product link (optional, https://...)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                      <input value={newLinkLabel} onChange={e => setNewLinkLabel(e.target.value)} placeholder="Retailer name (optional, e.g. Amazon)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
+                                      <input value={newNoteAuthor} onChange={e => setNewNoteAuthor(e.target.value)} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, boxSizing: "border-box", fontStyle: "italic" }} />
+                                      <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Why do you recommend this? (optional)" rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, resize: "vertical", fontStyle: "italic" }} />
+                                      <div style={{ display: "flex", gap: "8px" }}>
+                                        <button onClick={() => submitNewRec(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Add Recommendation</button>
+                                        <button onClick={() => { setAddingRecTo(null); setNewBrand(""); setNewModel(""); setNewNote(""); setNewNoteAuthor(""); setNewLinkUrl(""); setNewLinkLabel(""); }} style={{ padding: "9px 14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", background: "transparent", color: textSub, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>Cancel</button>
                                       </div>
                                     </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-
-                            {isRep && <div style={{ padding: "0 18px 8px", opacity: 0.15 }}><SnakeDivider color="white" opacity={1} /></div>}
-
-                            {addingRecTo === item.id ? (
-                              <div style={{ padding: "14px 18px", borderTop: `1px solid ${isRep ? R.border : borderCol}`, background: isRep ? R.dim : bg }}>
-                                <p style={{ margin: "0 0 10px", fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic" }}>
-                                  {isRep ? "🐍 Suggest a brand / model" : "✦ Suggest a brand / model"}
-                                </p>
-                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                                    <input value={newBrand} onChange={e => setNewBrand(e.target.value)} placeholder="Brand *" style={{ flex: "1 1 120px", padding: "8px 11px", border: `1.5px solid ${accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
-                                    <input value={newModel} onChange={e => setNewModel(e.target.value)} placeholder="Model / version" style={{ flex: "1 1 140px", padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
                                   </div>
-                                  <input value={newLinkUrl} onChange={e => setNewLinkUrl(e.target.value)} placeholder="Product link (optional, https://...)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
-                                  <input value={newLinkLabel} onChange={e => setNewLinkLabel(e.target.value)} placeholder="Retailer name (optional, e.g. Amazon)" style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, fontStyle: "italic" }} />
-                                  <input value={newNoteAuthor} onChange={e => setNewNoteAuthor(e.target.value)} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, boxSizing: "border-box", fontStyle: "italic" }} />
-                                  <textarea value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Why do you recommend this? (optional)" rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : cardBg, resize: "vertical", fontStyle: "italic" }} />
-                                  <div style={{ display: "flex", gap: "8px" }}>
-                                    <button onClick={() => submitNewRec(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Add Recommendation</button>
-                                    <button onClick={() => { setAddingRecTo(null); setNewBrand(""); setNewModel(""); setNewNote(""); setNewNoteAuthor(""); setNewLinkUrl(""); setNewLinkLabel(""); }} style={{ padding: "9px 14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", background: "transparent", color: textSub, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>Cancel</button>
+                                ) : (
+                                  <div style={{ padding: "11px 18px", borderTop: `1px ${isRep ? "solid" : "dashed"} ${isRep ? R.border : accentCol + "40"}` }}>
+                                    <button onClick={e => { e.stopPropagation(); setAddingRecTo(item.id); }} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 16px", borderRadius: isRep ? "2px" : "20px", border: `1.5px ${isRep ? "solid" : "dashed"} ${isRep ? R.borderHi : accentCol + "70"}`, background: "transparent", color: isRep ? R.textSub : accentCol, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: isRep ? "normal" : "italic" }}>
+                                      {isRep ? "🐍 Suggest another pick" : "✦ Suggest another pick"}
+                                    </button>
                                   </div>
+                                )}
+                              </>
+                            )}
+
+                            {/* ── Tips tab ── */}
+                            {tab === "tips" && (
+                              <div style={{ padding: "14px 18px" }}>
+                                {(item.tips || []).length === 0 && addingTipTo !== item.id && (
+                                  <p style={{ margin: "0 0 12px", color: mutedText, fontSize: "13px", fontStyle: "italic" }}>No tips yet — be the first to share what you wish you'd known.</p>
+                                )}
+                                <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: (item.tips || []).length > 0 ? "14px" : "0" }}>
+                                  {(item.tips || []).map((tip, ti) => {
+                                    const isNew = newTipSuccess === item.id && ti === (item.tips.length - 1);
+                                    return (
+                                      <div key={tip.id} style={{ display: "flex", gap: "10px", alignItems: "flex-start", padding: "10px 12px", borderRadius: isRep ? "2px" : "10px", background: isNew ? (isRep ? "rgba(100,200,100,0.1)" : accentCol + "12") : (isRep ? R.dim : bg + "80"), border: `1px solid ${isNew ? accentCol + "60" : (isRep ? R.border : borderCol)}`, transition: "background 0.3s" }}>
+                                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: isRep ? R.border : accentCol + "25", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "600", color: isRep ? R.textSub : accentCol, flexShrink: 0, fontStyle: "normal" }}>
+                                          {tip.author.slice(0,2).toUpperCase()}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                                            <span style={{ fontSize: "12.5px", fontWeight: "600", color: textMain }}>{tip.author}</span>
+                                            <span style={{ fontSize: "11px", color: mutedText }}>{tip.date}</span>
+                                          </div>
+                                          <p style={{ margin: 0, fontSize: "13px", color: textSub, lineHeight: "1.5", fontStyle: "italic" }}>{tip.text}</p>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
                                 </div>
-                              </div>
-                            ) : (
-                              <div style={{ padding: "11px 18px", borderTop: `1px ${isRep ? "solid" : "dashed"} ${isRep ? R.border : accentCol + "40"}` }}>
-                                <button onClick={e => { e.stopPropagation(); setAddingRecTo(item.id); }} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 16px", borderRadius: isRep ? "2px" : "20px", border: `1.5px ${isRep ? "solid" : "dashed"} ${isRep ? R.borderHi : accentCol + "70"}`, background: "transparent", color: isRep ? R.textSub : accentCol, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: isRep ? "normal" : "italic" }}>
-                                  {isRep ? "🐍 Suggest another pick" : "✦ Suggest another pick"}
-                                </button>
+                                {addingTipTo === item.id ? (
+                                  <div style={{ borderTop: (item.tips || []).length > 0 ? `1px solid ${isRep ? R.border : borderCol}` : "none", paddingTop: (item.tips || []).length > 0 ? "12px" : "0" }}>
+                                    <div style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                                      <input value={newTipAuthor} onChange={e => setNewTipAuthor(e.target.value)} placeholder="Your name (optional)" style={{ width: "160px", padding: "7px 11px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "12.5px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : bg, boxSizing: "border-box", fontStyle: "italic" }} />
+                                      <textarea value={newTipText} onChange={e => setNewTipText(e.target.value)} placeholder={`What do you wish you'd known before buying ${item.name.toLowerCase()}?`} rows={2} style={{ padding: "8px 11px", border: `1.5px solid ${isRep ? R.border : accentCol}`, borderRadius: isRep ? "2px" : "9px", fontSize: "13px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : bg, resize: "vertical", fontStyle: "italic" }} />
+                                      <div style={{ display: "flex", gap: "8px" }}>
+                                        <button onClick={() => addTip(item.id)} style={{ padding: "9px 18px", border: "none", borderRadius: isRep ? "2px" : "9px", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic" }}>Post tip</button>
+                                        <button onClick={() => { setAddingTipTo(null); setNewTipText(""); setNewTipAuthor(""); }} style={{ padding: "9px 14px", border: `1.5px solid ${isRep ? R.border : borderCol}`, borderRadius: isRep ? "2px" : "9px", background: "transparent", color: textSub, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>Cancel</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div style={{ borderTop: (item.tips || []).length > 0 ? `1px ${isRep ? "solid" : "dashed"} ${isRep ? R.border : accentCol + "40"}` : "none", paddingTop: (item.tips || []).length > 0 ? "11px" : "0" }}>
+                                    <button onClick={e => { e.stopPropagation(); setAddingTipTo(item.id); }} style={{ display: "flex", alignItems: "center", gap: "7px", padding: "7px 16px", borderRadius: isRep ? "2px" : "20px", border: `1.5px ${isRep ? "solid" : "dashed"} ${isRep ? R.borderHi : accentCol + "70"}`, background: "transparent", color: isRep ? R.textSub : accentCol, fontSize: "13px", cursor: "pointer", fontFamily: "inherit", fontStyle: isRep ? "normal" : "italic" }}>
+                                      🔖 Add a tip
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -685,17 +737,14 @@ export default function BabyRegistry() {
           )}
         </div>
 
-        {/* ── Success toast ── */}
         {successMsg && (
           <div style={{ position: "fixed", top: "20px", left: "50%", transform: "translateX(-50%)", background: isRep ? R.accent : accentCol, color: isRep ? R.bg : "#fff", padding: "11px 22px", borderRadius: "24px", fontSize: "14px", fontFamily: "inherit", fontStyle: "italic", zIndex: 60, boxShadow: `0 4px 20px ${accentCol}60`, animation: "successPop 0.4s cubic-bezier(0.34,1.56,0.64,1)", whiteSpace: "nowrap" }}>
             🎉 {successMsg}
           </div>
         )}
 
-        {/* ── Help button ── */}
         <button onClick={() => setHelpOpen(true)} style={{ position: "fixed", top: "20px", right: "20px", zIndex: 40, width: "38px", height: "38px", borderRadius: "50%", border: `1.5px solid ${isRep ? R.borderHi : accentCol + "60"}`, background: isRep ? R.dim : accentCol + "20", color: isRep ? R.textMain : accentCol, fontSize: "16px", fontWeight: "600", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(8px)", transition: "all 0.2s" }} title="How to use this">?</button>
 
-        {/* ── FAB ── */}
         <button onClick={() => setFabOpen(true)} onMouseEnter={() => setFabHover(true)} onMouseLeave={() => setFabHover(false)}
           style={{ position: "fixed", bottom: "28px", right: "24px", zIndex: 40, width: fabHover ? "auto" : "58px", height: "58px", padding: fabHover ? "0 22px" : "0", borderRadius: "29px", border: "none", background: `linear-gradient(135deg, ${accentCol}, ${accentCol}cc)`, color: isRep ? R.bg : "#fff", fontSize: fabHover ? "15px" : "24px", cursor: "pointer", fontFamily: "inherit", fontWeight: "600", boxShadow: `0 4px 20px ${accentCol}66`, transition: "all 0.25s cubic-bezier(0.34,1.56,0.64,1)", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", whiteSpace: "nowrap", overflow: "hidden", fontStyle: "italic" }}
           title="Add registry item"
@@ -717,35 +766,12 @@ export default function BabyRegistry() {
         @keyframes successPop { 0%{transform:translateX(-50%) scale(0.7);opacity:0}60%{transform:translateX(-50%) scale(1.05)}100%{transform:translateX(-50%) scale(1);opacity:1} }
         @keyframes modalPop { from{opacity:0;transform:translate(-50%,-48%) scale(0.96)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
-
-        /* ── Desktop font bump: all text +2pt on screens ≥ 768px ── */
         @media (min-width: 768px) {
-          .registry-root * {
-            font-size: calc(var(--fs, inherit) + 0px);
-          }
-          .registry-root {
-            font-size: 18px;
-          }
-          .registry-root h1 {
-            font-size: clamp(34px, 7vw, 60px) !important;
-          }
-          .registry-root h2 {
-            font-size: 19px !important;
-          }
-          .registry-root p,
-          .registry-root span,
-          .registry-root button,
-          .registry-root input,
-          .registry-root textarea,
-          .registry-root select,
-          .registry-root a,
-          .registry-root label {
-            font-size: calc(1em + 2px);
-          }
-          /* Keep small decorative elements from blowing up */
-          .registry-root .no-scale {
-            font-size: inherit !important;
-          }
+          .registry-root h1 { font-size: clamp(34px, 7vw, 60px) !important; }
+          .registry-root h2 { font-size: 19px !important; }
+          .registry-root p, .registry-root span, .registry-root button,
+          .registry-root input, .registry-root textarea, .registry-root select,
+          .registry-root a, .registry-root label { font-size: calc(1em + 2px); }
         }
       `}</style>
     </div>
