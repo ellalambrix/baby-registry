@@ -36,19 +36,22 @@ const ERA_LYRICS = {
 const CATEGORY_COLORS = {
   Sleep: "#7298af", Feeding: "#df9a81", Diapering: "#477760", Transport: "#295ba4",
   Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing & Comfort": "#e59bc4", "Wellness": "#7f2922",
+  "Travel": "#5a8a73",
   "Potty Training": "#477760", "Big Feelings & Social Emotional": "#e59bc4",
   "Play & Imagination": "#dccf73", "Toddler Feeding & Nutrition": "#df9a81",
   "Sleep (Toddler)": "#7298af", "Books & Learning": "#c8a951", "Outdoor & Active Play": "#5a8a73",
+  "Travel (Toddler)": "#5a8a73",
   "Hospital Bag": "#b8a4c9", "Feeding Support": "#df9a81", "Solids & Starting Foods": "#5a8a73",
   "Sleep Resources": "#7298af", "Postpartum Recovery": "#e59bc4", "Mental Health & Wellness": "#7f2922",
   "Parenting Tools & Apps": "#2e4f3f", "Screen Time & Apps": "#295ba4",
   "Childcare & Preschool": "#8b6914", "Recommended Reading": "#dccf73", "Favorite Shops & Resale": "#df9a81",
+  "Travel Tips": "#5a8a73",
 };
 const catColor = (cat) => CATEGORY_COLORS[cat] || "#df9a81";
 
-const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Wellness"];
-const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play"];
-const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale"];
+const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Wellness", "Travel"];
+const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play", "Travel (Toddler)"];
+const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale", "Travel Tips"];
 const BASE_CATEGORIES = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS];
 const MEDAL = ["🥇", "🥈", "🥉"];
 const SPARKLE = "✦";
