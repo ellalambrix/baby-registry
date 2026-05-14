@@ -104,7 +104,7 @@ function CornerSnake({ flip = false }) {
 
 // ── Music Player ───────────────────────────────────────────────────────────
 function MusicPlayer({ song, status, progress, duration, accentCol, textMain, mutedText, isRep, R, onPlay, onSeek, onDismiss }) {
-  const [panelOpen, setPanelOpen] = React.useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
   const hex = accentCol.replace("#","");
   const pr = parseInt(hex.slice(0,2),16), pg = parseInt(hex.slice(2,4),16), pb = parseInt(hex.slice(4,6),16);
   const pillBg     = isRep ? "rgba(255,255,255,0.07)" : `rgba(${pr},${pg},${pb},0.1)`;
