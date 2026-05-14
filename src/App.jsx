@@ -17,7 +17,20 @@ const ERAS = [
   { name: "The Life of a Showgirl", color: "#e05c2a", accent: "#e8f7f5", year: "2025", emoji: "💃" },
 ];
 
-const ERA_LYRICS = {
+const ERA_SONGS = {
+  "Taylor Swift":           { title: "Our Song",                  artist: "Taylor Swift" },
+  "Fearless":               { title: "Love Story",                artist: "Taylor Swift" },
+  "Speak Now":              { title: "Enchanted",                 artist: "Taylor Swift" },
+  "Red":                    { title: "22",                        artist: "Taylor Swift" },
+  "1989":                   { title: "Style",                     artist: "Taylor Swift" },
+  "Reputation":             { title: "Look What You Made Me Do",  artist: "Taylor Swift" },
+  "Lover":                  { title: "Lover",                     artist: "Taylor Swift" },
+  "Folklore":               { title: "Mirrorball",                artist: "Taylor Swift" },
+  "Evermore":               { title: "Willow",                    artist: "Taylor Swift" },
+  "Midnights":              { title: "Anti-Hero",                 artist: "Taylor Swift" },
+  "TTPD":                   { title: "Daddy I Love Him",          artist: "Taylor Swift" },
+  "The Life of a Showgirl": { title: "Opalite",                   artist: "Taylor Swift" },
+};
   "Taylor Swift": ["Our song is the way you laugh", "You're beautiful, every little piece, love", "Oh my, my, my, my", "I'm only me when I'm with you"],
   "Fearless": ["In this moment now, capture it, remember it", "I had the best day with you today", "You belong with me", "It's a love story, baby just say, \"Yes\""],
   "Speak Now": ["Long live all the mountains we moved", "You are the best thing that's ever been mine", "Oh darling, don't you ever grow up", "I was enchanted to meet you"],
@@ -323,6 +336,12 @@ export default function BabyRegistry() {
   const [fabHover, setFabHover]             = useState(false);
   const [helpOpen, setHelpOpen]             = useState(false);
   const [successMsg, setSuccessMsg]         = useState("");
+  const [playerUrl, setPlayerUrl]           = useState(null);
+  const [playerStatus, setPlayerStatus]     = useState("idle");
+  const [playerProgress, setPlayerProgress] = useState(0);
+  const [playerDuration, setPlayerDuration] = useState(30);
+  const [playerDismissed, setPlayerDismissed] = useState(false);
+  const audioRef                            = useRef(null);
   const [lyric, setLyric]                   = useState(() => { const l = ERA_LYRICS["Taylor Swift"]; return l[Math.floor(Math.random() * l.length)]; });
 
   // ── Era-derived colors ───────────────────────────────────────────────────
@@ -347,6 +366,76 @@ export default function BabyRegistry() {
     const lyrics = ERA_LYRICS[eraName] || [];
     setLyric(lyrics[Math.floor(Math.random() * lyrics.length)]);
     setActiveEra(eraName);
+    // Reset player — no persist across era switches
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; }
+    setPlayerUrl(null);
+    setPlayerStatus("idle");
+    setPlayerProgress(0);
+    setPlayerDismissed(false);
+  };
+
+  const fetchPreview = async (eraName) => {
+    const song = ERA_SONGS[eraName];
+    if (!song) return;
+    setPlayerStatus("loading");
+    setPlayerDismissed(false);
+    try {
+      const query = encodeURIComponent(`${song.title} ${song.artist}`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=5&media=music`);
+      const data = await res.json();
+      const match = (data.results || []).find(r =>
+        r.previewUrl &&
+        r.trackName.toLowerCase().includes(song.title.toLowerCase())
+      );
+      if (match?.previewUrl) {
+        setPlayerUrl(match.previewUrl);
+        setPlayerStatus("ready");
+      } else {
+        setPlayerStatus("unavailable");
+      }
+    } catch {
+      setPlayerStatus("unavailable");
+    }
+  };
+
+  // Audio event handlers
+  const handlePlay = () => {
+    if (playerStatus === "idle") { fetchPreview(activeEra); return; }
+    if (!audioRef.current || !playerUrl) return;
+    if (playerStatus === "playing") {
+      audioRef.current.pause();
+      setPlayerStatus("ready");
+    } else if (playerStatus === "ready") {
+      audioRef.current.play();
+      setPlayerStatus("playing");
+    }
+  };
+
+  // When URL loads, autoplay not triggered — user must press play
+  useEffect(() => {
+    if (playerUrl && audioRef.current) {
+      audioRef.current.src = playerUrl;
+      audioRef.current.load();
+    }
+  }, [playerUrl]);
+
+  const handleTimeUpdate = () => {
+    if (!audioRef.current) return;
+    setPlayerProgress(audioRef.current.currentTime);
+    setPlayerDuration(audioRef.current.duration || 30);
+  };
+
+  const handleEnded = () => {
+    setPlayerStatus("ready");
+    setPlayerProgress(0);
+    if (audioRef.current) audioRef.current.currentTime = 0;
+  };
+
+  const handleSeek = (e) => {
+    if (!audioRef.current) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audioRef.current.currentTime = pct * (audioRef.current.duration || 30);
   };
 
   const getTab = (itemId) => activeTab[itemId] || "recs";
@@ -537,6 +626,64 @@ export default function BabyRegistry() {
           </div>
           <h1 style={{ margin: "0 0 5px", fontSize: "clamp(26px, 5vw, 42px)", fontWeight: "400", color: textMain, fontStyle: "italic", lineHeight: 1.1 }}>Our Parenting Era</h1>
           <div style={{ fontSize: "15px", color: accentCol, marginTop: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{lyric}</div>
+
+          {/* ── Music player ── */}
+          {!playerDismissed && ERA_SONGS[activeEra] && (
+            <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${accentCol}45`, background: isRep ? "rgba(255,255,255,0.06)" : accentCol + "14", maxWidth: "340px", width: "100%" }}>
+
+                {/* Play/pause/loading button */}
+                {playerStatus === "loading" ? (
+                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid ${accentCol}30`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+                ) : (
+                  <button
+                    onClick={handlePlay}
+                    disabled={playerStatus === "unavailable"}
+                    style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: playerStatus === "unavailable" ? (isRep ? R.border : accentCol + "30") : accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: playerStatus === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: playerStatus === "unavailable" ? 0.5 : 1 }}
+                    aria-label={playerStatus === "playing" ? "Pause" : "Play preview"}
+                  >
+                    {playerStatus === "playing" ? "⏸" : playerStatus === "unavailable" ? "✕" : "▶"}
+                  </button>
+                )}
+
+                {/* Song info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {ERA_SONGS[activeEra].title}
+                  </div>
+                  <div style={{ fontSize: "11px", color: mutedText, letterSpacing: "0.04em" }}>
+                    {playerStatus === "loading" ? "Loading preview…" : playerStatus === "unavailable" ? "Preview unavailable" : "30s preview"}
+                  </div>
+                </div>
+
+                {/* Progress bar (only when ready/playing) */}
+                {(playerStatus === "ready" || playerStatus === "playing") && (
+                  <>
+                    <div
+                      onClick={handleSeek}
+                      style={{ width: "70px", height: "3px", borderRadius: "2px", background: accentCol + "30", cursor: "pointer", flexShrink: 0, position: "relative" }}
+                    >
+                      <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((playerProgress / playerDuration) * 100)}%`, transition: "width 0.1s linear" }} />
+                    </div>
+                    <span style={{ fontSize: "11px", color: mutedText, flexShrink: 0, fontFamily: "monospace", minWidth: "28px" }}>
+                      {`0:${String(Math.round(playerProgress)).padStart(2,"0")}`}
+                    </span>
+                  </>
+                )}
+
+                {/* Dismiss */}
+                <button
+                  onClick={() => { if (audioRef.current) { audioRef.current.pause(); } setPlayerDismissed(true); setPlayerStatus("idle"); }}
+                  style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid ${accentCol}40`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal" }}
+                  aria-label="Dismiss player"
+                >✕</button>
+
+              </div>
+            </div>
+          )}
+
+          {/* Hidden audio element */}
+          <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} style={{ display: "none" }} />
           <p style={{ margin: "14px 0 20px", color: textSub, fontSize: "16px", fontStyle: "italic" }}>Community-ranked recommendations — vote for your favorites</p>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "15px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
             <option value="category">Sort by Category</option>
