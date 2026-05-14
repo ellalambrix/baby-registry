@@ -374,15 +374,30 @@ export default function BabyRegistry() {
     setPlayerDismissed(false);
   };
 
-  const fetchPreview = async (eraName) => {
+  const fetchPreview = (eraName) => {
     const song = ERA_SONGS[eraName];
     if (!song) return;
     setPlayerStatus("loading");
     setPlayerDismissed(false);
-    try {
-      const query = encodeURIComponent(`${song.title} ${song.artist}`);
-      const res = await fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=5&media=music`);
-      const data = await res.json();
+
+    const callbackName = `itunesCb_${Date.now()}`;
+    const query = encodeURIComponent(`${song.title} Taylor Swift`);
+    const script = document.createElement("script");
+    script.src = `https://itunes.apple.com/search?term=${query}&entity=song&limit=5&media=music&callback=${callbackName}`;
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      setPlayerStatus("unavailable");
+    }, 8000);
+
+    const cleanup = () => {
+      clearTimeout(timeout);
+      delete window[callbackName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    };
+
+    window[callbackName] = (data) => {
+      cleanup();
       const match = (data.results || []).find(r =>
         r.previewUrl &&
         r.trackName.toLowerCase().includes(song.title.toLowerCase())
@@ -393,9 +408,10 @@ export default function BabyRegistry() {
       } else {
         setPlayerStatus("unavailable");
       }
-    } catch {
-      setPlayerStatus("unavailable");
-    }
+    };
+
+    script.onerror = () => { cleanup(); setPlayerStatus("unavailable"); };
+    document.head.appendChild(script);
   };
 
   // Audio event handlers
@@ -411,7 +427,7 @@ export default function BabyRegistry() {
     }
   };
 
-  // When URL loads, autoplay not triggered — user must press play
+  // When URL loads, set src directly — audio element doesn't enforce CORS like fetch()
   useEffect(() => {
     if (playerUrl && audioRef.current) {
       audioRef.current.src = playerUrl;
@@ -682,8 +698,8 @@ export default function BabyRegistry() {
             </div>
           )}
 
-          {/* Hidden audio element */}
-          <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} style={{ display: "none" }} />
+          {/* Hidden audio element — no crossOrigin so iTunes CDN URLs work */}
+          <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="none" style={{ display: "none" }} />
           <p style={{ margin: "14px 0 20px", color: textSub, fontSize: "16px", fontStyle: "italic" }}>Community-ranked recommendations — vote for your favorites</p>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "15px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
             <option value="category">Sort by Category</option>
