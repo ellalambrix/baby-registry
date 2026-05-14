@@ -134,12 +134,13 @@ function HelpModal({ isOpen, onClose, cardBg, textMain, textSub, mutedText, acce
 }
 
 // ── Add Item Modal ─────────────────────────────────────────────────────────
-function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, accentCol, isRep, R, cardBg, textMain, textSub, mutedText, bg }) {
+function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, accentCol, isRep, R, cardBg, textMain, textSub, mutedText, bg, sectionCats, borderCol }) {
   const [step, setStep]               = useState(1);
   const [itemName, setItemName]       = useState("");
   const [selectedCat, setSelectedCat] = useState("");
   const [newCatName, setNewCatName]   = useState("");
   const [isNewCat, setIsNewCat]       = useState(false);
+  const [selectedTags, setSelectedTags] = useState([]);
   const [brand, setBrand]             = useState("");
   const [model, setModel]             = useState("");
   const [note, setNote]               = useState("");
@@ -152,6 +153,7 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
     if (isOpen) {
       setStep(1); setItemName(""); setNewCatName(""); setBrand(""); setModel("");
       setNote(""); setAuthor(""); setLinkUrl(""); setLinkLabel(""); setIsNewCat(false);
+      setSelectedTags([]);
       setSelectedCat(activeCategory !== "All" ? activeCategory : categories[0] || "");
       setTimeout(() => firstInputRef.current?.focus(), 120);
     }
@@ -162,6 +164,12 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
   const finalCategory = isNewCat ? newCatName.trim() : selectedCat;
   const cc = catColor(finalCategory) || accentCol;
   const canProceed = itemName.trim() && finalCategory;
+
+  const availableTags = (sectionCats || []).filter(c => c !== finalCategory);
+  const toggleTag = (tag) => setSelectedTags(prev =>
+    prev.includes(tag) ? prev.filter(t => t !== tag) : prev.length < 3 ? [...prev, tag] : prev
+  );
+
   const iStyle = { width: "100%", padding: "10px 13px", border: `1.5px solid ${isRep ? R.border : "#e8e6e2"}`, borderRadius: isRep ? "4px" : "12px", fontSize: "16px", fontFamily: "inherit", outline: "none", color: textMain, background: isRep ? R.bg : "#fff", boxSizing: "border-box", transition: "border-color 0.15s", fontStyle: "italic" };
   const lStyle = { display: "block", fontSize: "13px", fontWeight: "600", color: mutedText, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "5px" };
 
@@ -169,7 +177,7 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
     if (!canProceed) return;
     const recId = `r-${Date.now()}`;
     const hasBrand = brand.trim() || model.trim();
-    onAdd({ id: Date.now(), category: finalCategory, name: itemName.trim(), tips: [], recs: hasBrand ? [{ id: recId, brand: brand.trim(), model: model.trim(), votes: 1, link_url: linkUrl.trim() || null, link_label: linkLabel.trim() || null, comments: note.trim() ? [{ id: Date.now(), author: author.trim() || "Anonymous", text: note.trim(), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }) }] : [] }] : [] });
+    onAdd({ id: Date.now(), category: finalCategory, name: itemName.trim(), tags: selectedTags, tips: [], recs: hasBrand ? [{ id: recId, brand: brand.trim(), model: model.trim(), votes: 1, link_url: linkUrl.trim() || null, link_label: linkLabel.trim() || null, comments: note.trim() ? [{ id: Date.now(), author: author.trim() || "Anonymous", text: note.trim(), date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }) }] : [] }] : [] });
     onClose();
   };
 
@@ -211,10 +219,45 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
                   </div>
                 )}
               </div>
+
+              {/* Cross-List To tag picker */}
+              {availableTags.length > 0 && finalCategory && (
+                <div style={{ padding: "12px 14px", borderRadius: isRep ? "4px" : "12px", background: isRep ? R.dim : bg, border: `1.5px solid ${isRep ? R.border : borderCol || "#e8e6e2"}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <label style={{ ...lStyle, marginBottom: 0 }}>Cross-List To</label>
+                    <span style={{ fontSize: "12px", color: selectedTags.length >= 3 ? "#c47860" : mutedText }}>{selectedTags.length} of 3</span>
+                  </div>
+                  {selectedTags.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginBottom: "8px" }}>
+                      {selectedTags.map(tag => (
+                        <span key={tag} onClick={() => toggleTag(tag)} style={{ display: "flex", alignItems: "center", gap: "4px", padding: "3px 8px 3px 10px", borderRadius: "20px", background: accentCol + "20", color: accentCol, border: `1px solid ${accentCol}50`, fontSize: "13px", cursor: "pointer", fontStyle: "normal" }}>
+                          {tag} <span style={{ fontSize: "11px", lineHeight: 1 }}>✕</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {availableTags.map(tag => {
+                      const isSelected = selectedTags.includes(tag);
+                      const isDisabled = !isSelected && selectedTags.length >= 3;
+                      return (
+                        <button key={tag} onClick={() => toggleTag(tag)} disabled={isDisabled} style={{ padding: "5px 12px", borderRadius: "20px", border: `1.5px solid ${isSelected ? accentCol : isRep ? R.border : "#e8e6e2"}`, background: isSelected ? accentCol + "22" : "transparent", color: isSelected ? accentCol : isDisabled ? mutedText : textSub, fontSize: "13px", cursor: isDisabled ? "default" : "pointer", fontFamily: "inherit", opacity: isDisabled ? 0.4 : 1, transition: "all 0.15s", fontWeight: isSelected ? "600" : "400" }}>{tag}</button>
+                      );
+                    })}
+                  </div>
+                  <p style={{ margin: "8px 0 0", fontSize: "12px", color: mutedText, fontStyle: "italic" }}>Optional — item will appear in up to 3 additional categories.</p>
+                </div>
+              )}
+
               {finalCategory && itemName.trim() && (
-                <div style={{ padding: "9px 13px", borderRadius: isRep ? "4px" : "12px", background: accentCol + "18", border: `1px solid ${accentCol}45`, display: "flex", alignItems: "center", gap: "8px" }}>
-                  <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: accentCol, flexShrink: 0 }} />
-                  <span style={{ fontSize: "15px", color: textMain, fontStyle: "italic" }}><strong>{itemName.trim()}</strong> → <strong>{finalCategory}</strong></span>
+                <div style={{ padding: "9px 13px", borderRadius: isRep ? "4px" : "12px", background: accentCol + "18", border: `1px solid ${accentCol}45`, display: "flex", flexDirection: "column", gap: "3px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: accentCol, flexShrink: 0 }} />
+                    <span style={{ fontSize: "15px", color: textMain, fontStyle: "italic" }}><strong>{itemName.trim()}</strong> → <strong>{finalCategory}</strong></span>
+                  </div>
+                  {selectedTags.length > 0 && (
+                    <span style={{ fontSize: "13px", color: accentCol, fontStyle: "italic", paddingLeft: "15px" }}>Cross-listed: {selectedTags.join(", ")}</span>
+                  )}
                 </div>
               )}
               <button onClick={() => setStep(2)} disabled={!canProceed} style={{ padding: "12px", borderRadius: isRep ? "4px" : "14px", border: "none", background: canProceed ? accentCol : (isRep ? R.border : "#e8e6e2"), color: canProceed ? (isRep ? R.bg : "#fff") : textSub, fontSize: "16px", cursor: canProceed ? "pointer" : "not-allowed", fontFamily: "inherit", fontWeight: "600", fontStyle: "italic", transition: "all 0.2s" }}>Next: Add a recommendation →</button>
@@ -338,7 +381,7 @@ export default function BabyRegistry() {
     setSuccessMsg(`"${newItem.name}" added to ${newItem.category}!`);
     setTimeout(() => setSuccessMsg(""), 3000);
     try {
-      const { data: itemData } = await supabase.from("items").insert({ id: newItem.id, category: newItem.category, name: newItem.name }).select().single();
+      const { data: itemData } = await supabase.from("items").insert({ id: newItem.id, category: newItem.category, name: newItem.name, tags: newItem.tags || [] }).select().single();
       if (newItem.recs.length > 0) {
         const rec = newItem.recs[0];
         await supabase.from("recs").insert({ id: rec.id, item_id: itemData.id, brand: rec.brand, model: rec.model, votes: rec.votes, link_url: rec.link_url || null, link_label: rec.link_label || null });
@@ -412,11 +455,33 @@ export default function BabyRegistry() {
     : allCategories.filter(c => PARENT_CATS.includes(c));
   const sectionLabel = activeSection === "baby" ? "For the little one" : activeSection === "toddler" ? "For the toddler" : "For the parent";
   const displayCategories = ["All", ...sectionCats];
+
+  // An item appears in a section if its primary category OR any of its tags belong to that section
+  const itemInSection = (item) => {
+    const cats = [item.category, ...(item.tags || [])];
+    return cats.some(c => sectionCats.includes(c));
+  };
+  // An item appears under a specific category filter if its primary category OR tags match
+  const itemInCategory = (item, cat) => {
+    if (cat === "All") return true;
+    return item.category === cat || (item.tags || []).includes(cat);
+  };
+  // When displaying, show the item under whichever category is active (primary or tag)
+  const displayCategory = (item) => {
+    if (activeCategory !== "All" && (item.tags || []).includes(activeCategory)) return activeCategory;
+    return item.category;
+  };
+
   const filtered = items
-    .filter(i => sectionCats.includes(i.category))
-    .filter(i => activeCategory === "All" || i.category === activeCategory)
+    .filter(i => itemInSection(i))
+    .filter(i => itemInCategory(i, activeCategory))
     .sort((a, b) => sortBy === "votes" ? Math.max(...b.recs.map(r => r.votes), 0) - Math.max(...a.recs.map(r => r.votes), 0) : a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
-  const grouped = filtered.reduce((acc, item) => { if (!acc[item.category]) acc[item.category] = []; acc[item.category].push(item); return acc; }, {});
+  const grouped = filtered.reduce((acc, item) => {
+    const cat = displayCategory(item);
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+    return acc;
+  }, {});
   const totalComments = (item) => item.recs.reduce((s, r) => s + r.comments.length, 0);
 
   if (loading) return (
@@ -558,6 +623,9 @@ export default function BabyRegistry() {
                             <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                               <span style={{ fontSize: "17px", fontWeight: "600", color: textMain, fontStyle: "italic" }}>{item.name}</span>
                               <span style={{ fontSize: "12px", padding: "2px 8px", borderRadius: isRep ? "2px" : "10px", background: isRep ? R.dim : cc + "22", color: isRep ? R.textSub : textMain, border: `1px solid ${isRep ? R.borderHi : cc + "55"}`, letterSpacing: isRep ? "0.08em" : "0", textTransform: isRep ? "uppercase" : "none" }}>{item.category}</span>
+                              {(item.tags || []).map(tag => (
+                                <span key={tag} style={{ fontSize: "12px", padding: "2px 8px", borderRadius: "10px", background: accentCol + "18", color: accentCol, border: `1px solid ${accentCol}50`, fontStyle: "normal" }}>{tag}</span>
+                              ))}
                             </div>
                             {topRec ? (
                               isParentSection ? (
@@ -792,7 +860,7 @@ export default function BabyRegistry() {
 
       </div>
 
-      <AddItemModal isOpen={fabOpen} onClose={() => setFabOpen(false)} categories={allCategories} activeCategory={activeCategory} onAdd={handleAddItem} accentCol={accentCol} isRep={isRep} R={R} cardBg={cardBg} textMain={textMain} textSub={textSub} mutedText={mutedText} bg={bg} />
+      <AddItemModal isOpen={fabOpen} onClose={() => setFabOpen(false)} categories={allCategories} activeCategory={activeCategory} onAdd={handleAddItem} accentCol={accentCol} isRep={isRep} R={R} cardBg={cardBg} textMain={textMain} textSub={textSub} mutedText={mutedText} bg={bg} sectionCats={sectionCats} borderCol={borderCol} />
       <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} cardBg={cardBg} textMain={textMain} textSub={textSub} mutedText={mutedText} accentCol={accentCol} isRep={isRep} R={R} />
 
       <style>{`
