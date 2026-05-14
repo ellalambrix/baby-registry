@@ -35,12 +35,12 @@ const ERA_LYRICS = {
 // ── Category config ────────────────────────────────────────────────────────
 const CATEGORY_COLORS = {
   Sleep: "#7298af", Feeding: "#df9a81", Diapering: "#477760", Transport: "#295ba4",
-  Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing & Comfort": "#e59bc4", "Wellness": "#7f2922",
+  Bathing: "#7298af", "Play & Development": "#dccf73", "Clothing": "#e59bc4", "Wellness": "#7f2922",
   "Travel": "#5a8a73",
   "Potty Training": "#477760", "Big Feelings & Social Emotional": "#e59bc4",
   "Play & Imagination": "#dccf73", "Toddler Feeding & Nutrition": "#df9a81",
   "Sleep (Toddler)": "#7298af", "Books & Learning": "#c8a951", "Outdoor & Active Play": "#5a8a73",
-  "Travel (Toddler)": "#5a8a73",
+  "Travel (Toddler)": "#5a8a73", "Clothing (Toddler)": "#e59bc4",
   "Hospital Bag": "#b8a4c9", "Feeding Support": "#df9a81", "Solids & Starting Foods": "#5a8a73",
   "Sleep Resources": "#7298af", "Postpartum Recovery": "#e59bc4", "Mental Health & Wellness": "#7f2922",
   "Parenting Tools & Apps": "#2e4f3f", "Screen Time & Apps": "#295ba4",
@@ -49,8 +49,8 @@ const CATEGORY_COLORS = {
 };
 const catColor = (cat) => CATEGORY_COLORS[cat] || "#df9a81";
 
-const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing & Comfort", "Wellness", "Travel"];
-const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play", "Travel (Toddler)"];
+const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing", "Wellness", "Travel"];
+const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play", "Travel (Toddler)", "Clothing (Toddler)"];
 const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale", "Travel Tips"];
 const BASE_CATEGORIES = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS];
 const MEDAL = ["🥇", "🥈", "🥉"];
@@ -95,6 +95,7 @@ function HelpModal({ isOpen, onClose, cardBg, textMain, textSub, mutedText, acce
     { icon: "🏆", title: "Vote for your favorites", body: "Tap any item to expand it. Hit ▲ if you loved it, ▼ if you didn't. The most-loved pick rises to the top. It's democracy, but make it baby gear." },
     { icon: "✨", title: "Community Wisdom", body: "Each item has a \"Community Wisdom\" tab with general advice — things to know before diving in. Add your own wisdom there." },
     { icon: "💬", title: "Leave a note", body: "Tap 💬 on any recommendation to share the real talk. Or add to Community Wisdom for general advice. Your name is optional. Your opinions are not." },
+    { icon: "🏷️", title: "Cross-list items", body: <>When adding a new item, use <strong style={{ fontWeight: "600" }}>Cross-List To</strong> to make it appear in up to 3 additional categories. A travel potty added under Potty Training can also show up under Travel — same item, same recs, everywhere it's relevant.</> },
     { icon: "✦", title: "Add what's missing", body: <>Hit the <strong style={{ fontWeight: "600" }}>✦ button</strong> bottom-right to add a new item, or tap <strong style={{ fontWeight: "600" }}>"Suggest another brand"</strong> inside any item.</> },
   ];
   return (
@@ -165,7 +166,7 @@ function AddItemModal({ isOpen, onClose, categories, activeCategory, onAdd, acce
   const cc = catColor(finalCategory) || accentCol;
   const canProceed = itemName.trim() && finalCategory;
 
-  const availableTags = (sectionCats || []).filter(c => c !== finalCategory);
+  const availableTags = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS].filter(c => c !== finalCategory);
   const toggleTag = (tag) => setSelectedTags(prev =>
     prev.includes(tag) ? prev.filter(t => t !== tag) : prev.length < 3 ? [...prev, tag] : prev
   );
