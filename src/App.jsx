@@ -104,38 +104,73 @@ function CornerSnake({ flip = false }) {
 
 // ── Music Player ───────────────────────────────────────────────────────────
 function MusicPlayer({ song, status, progress, duration, accentCol, textMain, mutedText, isRep, R, onPlay, onSeek, onDismiss }) {
+  const [panelOpen, setPanelOpen] = React.useState(false);
   const hex = accentCol.replace("#","");
   const pr = parseInt(hex.slice(0,2),16), pg = parseInt(hex.slice(2,4),16), pb = parseInt(hex.slice(4,6),16);
-  const playerBg = isRep ? "rgba(255,255,255,0.06)" : `rgba(${pr},${pg},${pb},0.1)`;
-  const borderCol = `rgba(${pr},${pg},${pb},0.4)`;
+  const pillBg     = isRep ? "rgba(255,255,255,0.07)" : `rgba(${pr},${pg},${pb},0.1)`;
+  const pillBorder = `rgba(${pr},${pg},${pb},0.4)`;
+  const panelBg    = isRep ? "#111" : `rgba(${pr},${pg},${pb},0.12)`;
+  const isPlaying  = status === "playing";
+  const hasProgress = status === "ready" || status === "playing";
+
+  const pillLabel = isPlaying
+    ? `playing · 0:${String(Math.round(progress)).padStart(2,"0")}`
+    : "30s preview";
+
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${borderCol}`, background: playerBg, maxWidth: "340px", width: "100%", boxSizing: "border-box" }}>
+    <div style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", zIndex: 10 }}>
+      {/* ── Pill ── */}
+      <div
+        onClick={() => setPanelOpen(o => !o)}
+        style={{ display: "flex", alignItems: "center", gap: "7px", padding: "5px 10px 5px 6px", borderRadius: "20px", border: `1.5px solid ${pillBorder}`, background: pillBg, cursor: "pointer", userSelect: "none" }}
+      >
         {status === "loading" ? (
-          <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid rgba(${pr},${pg},${pb},0.2)`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+          <div style={{ width: "26px", height: "26px", borderRadius: "50%", border: `2px solid rgba(${pr},${pg},${pb},0.15)`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
         ) : (
-          <button onClick={onPlay} disabled={status === "unavailable"} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: status === "unavailable" ? `rgba(${pr},${pg},${pb},0.2)` : accentCol, color: isRep ? R.bg : "#fff", fontSize: "12px", cursor: status === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: status === "unavailable" ? 0.5 : 1, fontStyle: "normal", fontFamily: "inherit" }}>
-            {status === "playing" ? "⏸" : "▶"}
-          </button>
+          <div style={{ width: "26px", height: "26px", borderRadius: "50%", background: accentCol, color: isRep ? R.bg : "#fff", fontSize: "11px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal" }}>
+            {isPlaying ? "⏸" : "▶"}
+          </div>
         )}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{song.title}</div>
-          <div style={{ fontSize: "11px", color: mutedText, letterSpacing: "0.04em" }}>
-            {status === "loading" ? "Loading preview…" : status === "unavailable" ? "Preview unavailable" : "30s preview · iTunes"}
+        {/* Desktop: show text. Mobile: icon only via CSS */}
+        <div className="player-pill-text">
+          <div style={{ fontSize: "11px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis" }}>{song.title}</div>
+          <div style={{ fontSize: "10px", color: mutedText, whiteSpace: "nowrap" }}>{pillLabel}</div>
+        </div>
+      </div>
+
+      {/* ── Hover panel ── */}
+      {panelOpen && (
+        <div style={{ position: "absolute", bottom: "calc(100% + 10px)", left: 0, width: "280px", borderRadius: "14px", padding: "13px 14px 14px", border: `1.5px solid ${pillBorder}`, background: panelBg, backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", animation: "panelPop 0.25s cubic-bezier(0.34,1.56,0.64,1)" }}>
+          {/* Arrow */}
+          <div style={{ position: "absolute", bottom: "-7px", left: "18px", width: "12px", height: "12px", background: panelBg, borderRight: `1.5px solid ${pillBorder}`, borderBottom: `1.5px solid ${pillBorder}`, transform: "rotate(45deg)" }} />
+          {/* Dismiss */}
+          <button onClick={e => { e.stopPropagation(); onDismiss(); }} style={{ position: "absolute", top: "9px", right: "9px", width: "18px", height: "18px", borderRadius: "50%", border: `1px solid ${pillBorder}`, background: "transparent", color: mutedText, fontSize: "10px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontStyle: "normal", fontFamily: "inherit" }}>✕</button>
+          <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", paddingRight: "22px", marginBottom: "2px" }}>{song.title}</div>
+          <div style={{ fontSize: "11px", color: mutedText, marginBottom: "10px" }}>Taylor Swift · iTunes 30s preview</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button onClick={e => { e.stopPropagation(); onPlay(); }} style={{ width: "34px", height: "34px", borderRadius: "50%", border: "none", background: status === "unavailable" ? `rgba(${pr},${pg},${pb},0.2)` : accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: status === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal", fontFamily: "inherit", opacity: status === "unavailable" ? 0.5 : 1 }}>
+              {status === "loading" ? "…" : isPlaying ? "⏸" : "▶"}
+            </button>
+            <div style={{ flex: 1 }}>
+              {hasProgress ? (
+                <>
+                  <div onClick={e => { e.stopPropagation(); onSeek(e); }} style={{ height: "3px", borderRadius: "2px", background: `rgba(${pr},${pg},${pb},0.2)`, cursor: "pointer", marginBottom: "5px" }}>
+                    <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((progress / (duration || 30)) * 100)}%`, transition: "width 0.1s linear" }} />
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10px", color: mutedText, fontFamily: "monospace" }}>
+                    <span>{`0:${String(Math.round(progress)).padStart(2,"0")}`}</span>
+                    <span>0:30</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontSize: "11px", color: mutedText, fontStyle: "italic" }}>
+                  {status === "idle" ? "Tap ▶ to load preview" : status === "unavailable" ? "Preview not available" : "Loading…"}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        {(status === "ready" || status === "playing") && (
-          <>
-            <div onClick={onSeek} style={{ width: "70px", height: "3px", borderRadius: "2px", background: `rgba(${pr},${pg},${pb},0.2)`, cursor: "pointer", flexShrink: 0 }}>
-              <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((progress / (duration || 30)) * 100)}%`, transition: "width 0.1s linear" }} />
-            </div>
-            <span style={{ fontSize: "11px", color: mutedText, flexShrink: 0, fontFamily: "monospace", minWidth: "28px" }}>
-              {`0:${String(Math.round(progress)).padStart(2,"0")}`}
-            </span>
-          </>
-        )}
-        <button onClick={onDismiss} style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid rgba(${pr},${pg},${pb},0.3)`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal", fontFamily: "inherit" }} aria-label="Dismiss player">✕</button>
-      </div>
+      )}
     </div>
   );
 }
@@ -680,28 +715,28 @@ export default function BabyRegistry() {
           <div style={{ fontSize: "15px", letterSpacing: "0.25em", color: accentCol, textTransform: "uppercase", marginBottom: "10px", fontStyle: "italic" }}>
             {isRep ? "𝕿𝖍𝖊 𝕽𝖊𝖕𝖚𝖙𝖆𝖙𝖎𝖔𝖓 𝕰𝖗𝖆" : <><span style={{ fontStyle: "normal" }}>{era.emoji}</span>{` The ${activeEra} Era `}<span style={{ fontStyle: "normal" }}>{era.emoji}</span></>}
           </div>
-          <h1 style={{ margin: "0 0 5px", fontSize: "clamp(26px, 5vw, 42px)", fontWeight: "400", color: textMain, fontStyle: "italic", lineHeight: 1.1 }}>Our Parenting Era</h1>
+          <div style={{ position: "relative", display: "inline-block", width: "100%" }}>
+            {!playerDismissed && ERA_SONGS[activeEra] && (
+              <MusicPlayer
+                song={ERA_SONGS[activeEra]}
+                status={playerStatus}
+                progress={playerProgress}
+                duration={playerDuration}
+                accentCol={accentCol}
+                textMain={textMain}
+                mutedText={mutedText}
+                isRep={isRep}
+                R={R}
+                onPlay={handlePlay}
+                onSeek={handleSeek}
+                onDismiss={() => { if (audioRef.current) audioRef.current.pause(); setPlayerDismissed(true); setPlayerStatus("idle"); }}
+              />
+            )}
+            <h1 style={{ margin: "0 0 5px", fontSize: "clamp(26px, 5vw, 42px)", fontWeight: "400", color: textMain, fontStyle: "italic", lineHeight: 1.1 }}>Our Parenting Era</h1>
+          </div>
           <div style={{ fontSize: "15px", color: accentCol, marginTop: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{lyric}</div>
 
-          {/* ── Music player ── */}
-          {!playerDismissed && ERA_SONGS[activeEra] && (
-            <MusicPlayer
-              song={ERA_SONGS[activeEra]}
-              status={playerStatus}
-              progress={playerProgress}
-              duration={playerDuration}
-              accentCol={accentCol}
-              textMain={textMain}
-              mutedText={mutedText}
-              isRep={isRep}
-              R={R}
-              onPlay={handlePlay}
-              onSeek={handleSeek}
-              onDismiss={() => { if (audioRef.current) audioRef.current.pause(); setPlayerDismissed(true); setPlayerStatus("idle"); }}
-            />
-          )}
-
-          {/* Hidden audio element — no crossOrigin so iTunes CDN URLs work */}
+          {/* Hidden audio element */}
           <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="none" style={{ display: "none" }} />
           <p style={{ margin: "14px 0 20px", color: textSub, fontSize: "16px", fontStyle: "italic" }}>Community-ranked recommendations — vote for your favorites</p>
           <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ padding: "7px 14px", borderRadius: "20px", border: `1.5px solid ${accentCol}50`, background: isRep ? R.dim : "rgba(255,255,255,0.6)", color: textMain, fontSize: "15px", cursor: "pointer", fontFamily: "inherit", fontStyle: "italic" }}>
@@ -1038,22 +1073,12 @@ export default function BabyRegistry() {
         @keyframes successPop { 0%{transform:translateX(-50%) scale(0.7);opacity:0}60%{transform:translateX(-50%) scale(1.05)}100%{transform:translateX(-50%) scale(1);opacity:1} }
         @keyframes modalPop { from{opacity:0;transform:translate(-50%,-48%) scale(0.96)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
         @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
+        @keyframes panelPop { from{opacity:0;transform:translateY(6px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
 
-        /* ── Prevent emoji from inheriting italic ── */
-        .registry-root { font-synthesis: none; }
-        .registry-root *::before { font-style: normal; }
-        @font-face {
-          font-family: 'emoji-upright';
-          src: local('Apple Color Emoji'), local('Segoe UI Emoji'), local('Noto Color Emoji');
-          font-style: normal;
-          unicode-range: U+1F300-1FAFF, U+2600-27BF, U+FE0F, U+200D;
-        }
-        .emoji-upright, .registry-root span[role="img"] { font-style: normal !important; }
+        /* Hide pill text on mobile — icon only */
+        @media (max-width: 480px) { .player-pill-text { display: none; } }
 
-        /* Broadest reliable fix — wrap any element that should never italicize emojis */
-        .registry-root button, .registry-root a { font-style: inherit; }
-        .registry-root .no-italic { font-style: normal !important; }
-
+        /* ── Desktop font bump ── */
         @media (min-width: 768px) {
           .registry-root h1 { font-size: clamp(28px, 5vw, 44px) !important; }
           .registry-root h2 { font-size: 20px !important; }
