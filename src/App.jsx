@@ -644,41 +644,40 @@ export default function BabyRegistry() {
           <div style={{ fontSize: "15px", color: accentCol, marginTop: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{lyric}</div>
 
           {/* ── Music player ── */}
-          {!playerDismissed && ERA_SONGS[activeEra] && (
+          {!playerDismissed && ERA_SONGS[activeEra] && (() => {
+            const hex = accentCol.replace("#","");
+            const pr = parseInt(hex.slice(0,2),16), pg = parseInt(hex.slice(2,4),16), pb = parseInt(hex.slice(4,6),16);
+            const playerBg = isRep ? "rgba(255,255,255,0.06)" : `rgba(${pr},${pg},${pb},0.1)`;
+            const playerBorder = `rgba(${pr},${pg},${pb},0.45)`;
+            return (
             <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${accentCol}45`, background: isRep ? "rgba(255,255,255,0.06)" : accentCol + "14", maxWidth: "340px", width: "100%" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${playerBorder}`, background: playerBg, maxWidth: "340px", width: "100%", boxSizing: "border-box" }}>
 
-                {/* Play/pause/loading button */}
                 {playerStatus === "loading" ? (
-                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid ${accentCol}30`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid rgba(${pr},${pg},${pb},0.2)`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
                 ) : (
                   <button
                     onClick={handlePlay}
                     disabled={playerStatus === "unavailable"}
-                    style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: playerStatus === "unavailable" ? (isRep ? R.border : accentCol + "30") : accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: playerStatus === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: playerStatus === "unavailable" ? 0.5 : 1 }}
+                    style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: playerStatus === "unavailable" ? `rgba(${pr},${pg},${pb},0.25)` : accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: playerStatus === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: playerStatus === "unavailable" ? 0.5 : 1, fontStyle: "normal" }}
                     aria-label={playerStatus === "playing" ? "Pause" : "Play preview"}
                   >
-                    {playerStatus === "playing" ? "⏸" : playerStatus === "unavailable" ? "✕" : "▶"}
+                    {playerStatus === "playing" ? "⏸" : "▶"}
                   </button>
                 )}
 
-                {/* Song info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {ERA_SONGS[activeEra].title}
                   </div>
                   <div style={{ fontSize: "11px", color: mutedText, letterSpacing: "0.04em" }}>
-                    {playerStatus === "loading" ? "Loading preview…" : playerStatus === "unavailable" ? "Preview unavailable" : "30s preview"}
+                    {playerStatus === "loading" ? "Loading preview…" : playerStatus === "unavailable" ? "Preview unavailable" : "30s preview · iTunes"}
                   </div>
                 </div>
 
-                {/* Progress bar (only when ready/playing) */}
                 {(playerStatus === "ready" || playerStatus === "playing") && (
                   <>
-                    <div
-                      onClick={handleSeek}
-                      style={{ width: "70px", height: "3px", borderRadius: "2px", background: accentCol + "30", cursor: "pointer", flexShrink: 0, position: "relative" }}
-                    >
+                    <div onClick={handleSeek} style={{ width: "70px", height: "3px", borderRadius: "2px", background: `rgba(${pr},${pg},${pb},0.25)`, cursor: "pointer", flexShrink: 0 }}>
                       <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((playerProgress / playerDuration) * 100)}%`, transition: "width 0.1s linear" }} />
                     </div>
                     <span style={{ fontSize: "11px", color: mutedText, flexShrink: 0, fontFamily: "monospace", minWidth: "28px" }}>
@@ -687,16 +686,16 @@ export default function BabyRegistry() {
                   </>
                 )}
 
-                {/* Dismiss */}
                 <button
-                  onClick={() => { if (audioRef.current) { audioRef.current.pause(); } setPlayerDismissed(true); setPlayerStatus("idle"); }}
-                  style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid ${accentCol}40`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal" }}
+                  onClick={() => { if (audioRef.current) audioRef.current.pause(); setPlayerDismissed(true); setPlayerStatus("idle"); }}
+                  style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid rgba(${pr},${pg},${pb},0.35)`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal" }}
                   aria-label="Dismiss player"
                 >✕</button>
 
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* Hidden audio element — no crossOrigin so iTunes CDN URLs work */}
           <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="none" style={{ display: "none" }} />
