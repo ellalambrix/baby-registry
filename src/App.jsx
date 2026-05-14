@@ -31,6 +31,8 @@ const ERA_SONGS = {
   "TTPD":                   { title: "Daddy I Love Him",          artist: "Taylor Swift" },
   "The Life of a Showgirl": { title: "Opalite",                   artist: "Taylor Swift" },
 };
+
+const ERA_LYRICS = {
   "Taylor Swift": ["Our song is the way you laugh", "You're beautiful, every little piece, love", "Oh my, my, my, my", "I'm only me when I'm with you"],
   "Fearless": ["In this moment now, capture it, remember it", "I had the best day with you today", "You belong with me", "It's a love story, baby just say, \"Yes\""],
   "Speak Now": ["Long live all the mountains we moved", "You are the best thing that's ever been mine", "Oh darling, don't you ever grow up", "I was enchanted to meet you"],
@@ -97,6 +99,44 @@ function CornerSnake({ flip = false }) {
       <ellipse cx="10" cy="8" rx="8" ry="6" fill="white" />
       <circle cx="7" cy="6" r="1.5" fill="#050505" /><circle cx="13" cy="6" r="1.5" fill="#050505" />
     </svg>
+  );
+}
+
+// ── Music Player ───────────────────────────────────────────────────────────
+function MusicPlayer({ song, status, progress, duration, accentCol, textMain, mutedText, isRep, R, onPlay, onSeek, onDismiss }) {
+  const hex = accentCol.replace("#","");
+  const pr = parseInt(hex.slice(0,2),16), pg = parseInt(hex.slice(2,4),16), pb = parseInt(hex.slice(4,6),16);
+  const playerBg = isRep ? "rgba(255,255,255,0.06)" : `rgba(${pr},${pg},${pb},0.1)`;
+  const borderCol = `rgba(${pr},${pg},${pb},0.4)`;
+  return (
+    <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${borderCol}`, background: playerBg, maxWidth: "340px", width: "100%", boxSizing: "border-box" }}>
+        {status === "loading" ? (
+          <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid rgba(${pr},${pg},${pb},0.2)`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
+        ) : (
+          <button onClick={onPlay} disabled={status === "unavailable"} style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: status === "unavailable" ? `rgba(${pr},${pg},${pb},0.2)` : accentCol, color: isRep ? R.bg : "#fff", fontSize: "12px", cursor: status === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: status === "unavailable" ? 0.5 : 1, fontStyle: "normal", fontFamily: "inherit" }}>
+            {status === "playing" ? "⏸" : "▶"}
+          </button>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{song.title}</div>
+          <div style={{ fontSize: "11px", color: mutedText, letterSpacing: "0.04em" }}>
+            {status === "loading" ? "Loading preview…" : status === "unavailable" ? "Preview unavailable" : "30s preview · iTunes"}
+          </div>
+        </div>
+        {(status === "ready" || status === "playing") && (
+          <>
+            <div onClick={onSeek} style={{ width: "70px", height: "3px", borderRadius: "2px", background: `rgba(${pr},${pg},${pb},0.2)`, cursor: "pointer", flexShrink: 0 }}>
+              <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((progress / (duration || 30)) * 100)}%`, transition: "width 0.1s linear" }} />
+            </div>
+            <span style={{ fontSize: "11px", color: mutedText, flexShrink: 0, fontFamily: "monospace", minWidth: "28px" }}>
+              {`0:${String(Math.round(progress)).padStart(2,"0")}`}
+            </span>
+          </>
+        )}
+        <button onClick={onDismiss} style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid rgba(${pr},${pg},${pb},0.3)`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal", fontFamily: "inherit" }} aria-label="Dismiss player">✕</button>
+      </div>
+    </div>
   );
 }
 
@@ -644,58 +684,22 @@ export default function BabyRegistry() {
           <div style={{ fontSize: "15px", color: accentCol, marginTop: "10px", letterSpacing: "0.15em", textTransform: "uppercase" }}>{lyric}</div>
 
           {/* ── Music player ── */}
-          {!playerDismissed && ERA_SONGS[activeEra] && (() => {
-            const hex = accentCol.replace("#","");
-            const pr = parseInt(hex.slice(0,2),16), pg = parseInt(hex.slice(2,4),16), pb = parseInt(hex.slice(4,6),16);
-            const playerBg = isRep ? "rgba(255,255,255,0.06)" : `rgba(${pr},${pg},${pb},0.1)`;
-            const playerBorder = `rgba(${pr},${pg},${pb},0.45)`;
-            return (
-            <div style={{ display: "flex", justifyContent: "center", marginTop: "14px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "7px 12px 7px 8px", borderRadius: "24px", border: `1.5px solid ${playerBorder}`, background: playerBg, maxWidth: "340px", width: "100%", boxSizing: "border-box" }}>
-
-                {playerStatus === "loading" ? (
-                  <div style={{ width: "30px", height: "30px", borderRadius: "50%", border: `2px solid rgba(${pr},${pg},${pb},0.2)`, borderTopColor: accentCol, animation: "spin 0.8s linear infinite", flexShrink: 0 }} />
-                ) : (
-                  <button
-                    onClick={handlePlay}
-                    disabled={playerStatus === "unavailable"}
-                    style={{ width: "30px", height: "30px", borderRadius: "50%", border: "none", background: playerStatus === "unavailable" ? `rgba(${pr},${pg},${pb},0.25)` : accentCol, color: isRep ? R.bg : "#fff", fontSize: "13px", cursor: playerStatus === "unavailable" ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s", opacity: playerStatus === "unavailable" ? 0.5 : 1, fontStyle: "normal" }}
-                    aria-label={playerStatus === "playing" ? "Pause" : "Play preview"}
-                  >
-                    {playerStatus === "playing" ? "⏸" : "▶"}
-                  </button>
-                )}
-
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "13px", fontWeight: "600", color: textMain, fontStyle: "italic", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {ERA_SONGS[activeEra].title}
-                  </div>
-                  <div style={{ fontSize: "11px", color: mutedText, letterSpacing: "0.04em" }}>
-                    {playerStatus === "loading" ? "Loading preview…" : playerStatus === "unavailable" ? "Preview unavailable" : "30s preview · iTunes"}
-                  </div>
-                </div>
-
-                {(playerStatus === "ready" || playerStatus === "playing") && (
-                  <>
-                    <div onClick={handleSeek} style={{ width: "70px", height: "3px", borderRadius: "2px", background: `rgba(${pr},${pg},${pb},0.25)`, cursor: "pointer", flexShrink: 0 }}>
-                      <div style={{ height: "100%", borderRadius: "2px", background: accentCol, width: `${Math.round((playerProgress / playerDuration) * 100)}%`, transition: "width 0.1s linear" }} />
-                    </div>
-                    <span style={{ fontSize: "11px", color: mutedText, flexShrink: 0, fontFamily: "monospace", minWidth: "28px" }}>
-                      {`0:${String(Math.round(playerProgress)).padStart(2,"0")}`}
-                    </span>
-                  </>
-                )}
-
-                <button
-                  onClick={() => { if (audioRef.current) audioRef.current.pause(); setPlayerDismissed(true); setPlayerStatus("idle"); }}
-                  style={{ width: "20px", height: "20px", borderRadius: "50%", border: `1px solid rgba(${pr},${pg},${pb},0.35)`, background: "transparent", color: mutedText, fontSize: "11px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontStyle: "normal" }}
-                  aria-label="Dismiss player"
-                >✕</button>
-
-              </div>
-            </div>
-            );
-          })()}
+          {!playerDismissed && ERA_SONGS[activeEra] && (
+            <MusicPlayer
+              song={ERA_SONGS[activeEra]}
+              status={playerStatus}
+              progress={playerProgress}
+              duration={playerDuration}
+              accentCol={accentCol}
+              textMain={textMain}
+              mutedText={mutedText}
+              isRep={isRep}
+              R={R}
+              onPlay={handlePlay}
+              onSeek={handleSeek}
+              onDismiss={() => { if (audioRef.current) audioRef.current.pause(); setPlayerDismissed(true); setPlayerStatus("idle"); }}
+            />
+          )}
 
           {/* Hidden audio element — no crossOrigin so iTunes CDN URLs work */}
           <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} onEnded={handleEnded} preload="none" style={{ display: "none" }} />
