@@ -61,12 +61,13 @@ const CATEGORY_COLORS = {
   "Parenting Tools & Apps": "#2e4f3f", "Screen Time & Apps": "#295ba4",
   "Childcare & Preschool": "#8b6914", "Recommended Reading": "#dccf73", "Favorite Shops & Resale": "#df9a81",
   "Travel Tips": "#5a8a73",
+  "Memory Keeping": "#c8a951",
 };
 const catColor = (cat) => CATEGORY_COLORS[cat] || "#df9a81";
 
 const BABY_CATS    = ["Sleep", "Feeding", "Diapering", "Transport", "Bathing", "Play & Development", "Clothing", "Wellness", "Travel"];
 const TODDLER_CATS = ["Potty Training", "Big Feelings & Social Emotional", "Play & Imagination", "Toddler Feeding & Nutrition", "Sleep (Toddler)", "Books & Learning", "Outdoor & Active Play", "Travel (Toddler)", "Clothing (Toddler)"];
-const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale", "Travel Tips"];
+const PARENT_CATS  = ["Hospital Bag", "Feeding Support", "Solids & Starting Foods", "Sleep Resources", "Postpartum Recovery", "Mental Health & Wellness", "Parenting Tools & Apps", "Screen Time & Apps", "Childcare & Preschool", "Recommended Reading", "Favorite Shops & Resale", "Travel Tips", "Memory Keeping"];
 const BASE_CATEGORIES = [...BABY_CATS, ...TODDLER_CATS, ...PARENT_CATS];
 const MEDAL = ["🥇", "🥈", "🥉"];
 const SPARKLE = "✦";
